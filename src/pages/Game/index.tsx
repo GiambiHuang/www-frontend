@@ -17,6 +17,7 @@ import useResetGame from '@/hooks/useResetGame';
 import PendingScreen from '@/modals/PendingScreen';
 import useGetGameStatus from '@/hooks/useGetGameStatus';
 import { AppWalletState } from '@/stores/global'
+import { toast } from 'react-toastify';
 
 const Game: FC = () => {
   const appWallet = useRecoilValue(AppWalletState);
@@ -53,8 +54,7 @@ const Game: FC = () => {
         
         setSelected(targetPublicKey.toString());
       } catch (error) {
-        console.log(error);
-        // toast.error('----');
+        toast.error((error as Error).message);
         setPending(false);
       }
     }

@@ -12,6 +12,7 @@ import { getAttackPDA, getGamePDA, getPlayerPDA } from "@/utils/www";
 import { gameMatchPublicKey } from "@/constants/network";
 import { PlayerState } from "@/stores/game";
 import useGetGameStatus from "@/hooks/useGetGameStatus";
+import { toast } from "react-toastify";
 
 const SelectAmount: FC = () => {
   const { openModal: openRuleModal } = useRuleModal();
@@ -58,6 +59,7 @@ const SelectAmount: FC = () => {
           init: true,
         })
       } catch (error) {
+        toast.error((error as Error).message);
         setLoading(false);
       }
     }
