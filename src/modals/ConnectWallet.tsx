@@ -5,7 +5,7 @@ import { FC } from "react";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { styled } from "styled-components";
 import MetaMask from "@/assets/icons/metamask.svg?react";
-// import Salmon from "@/assets/icons/salmon.svg?react";
+import Salmon from "@/assets/icons/salmon.svg?react";
 import Close from "@/assets/icons/close.svg?react";
 
 import { Box, Flex, chakra } from "@chakra-ui/react";
@@ -43,6 +43,7 @@ const ConnectWallet: FC = () => {
   const connectWalletState = useRecoilValue(ConnectWalletState);
   const resetConnectWallet = useResetRecoilState(ConnectWalletState);
   const { wallets, select } = useWallet();
+  console.log(wallets);
   return (
     <AppModal open={connectWalletState.open}>
       <Flex justifyContent="center" position="relative" minH="24rem" fontFamily="Potta One" bg="button.border" px="2.125rem" borderRadius="1rem" border="0.5rem" borderStyle="solid" borderColor="button.bg">
@@ -74,6 +75,16 @@ const ConnectWallet: FC = () => {
             >
               <MetaMask />
               <Box flex={1}>MetaMask</Box>
+              {['Installed', 'Loadable'].includes(wallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
+            </Option>
+          ))}
+          {wallets.filter(wallet => wallet.adapter.name.includes('Salmon')).map(wallet => (
+            <Option
+              key={wallet.adapter.name}
+              onClick={() => select(wallet.adapter.name)}
+            >
+              <Salmon />
+              <Box flex={1}>Salmon</Box>
               {['Installed', 'Loadable'].includes(wallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
             </Option>
           ))}
