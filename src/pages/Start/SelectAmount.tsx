@@ -1,63 +1,53 @@
 import { FC, useState } from "react";
 import { Flex, Box, Text, Button } from "@chakra-ui/react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import AmountBoard from "@/components/AmountBoard";
 import { WAGER_AMOUNTS } from "@/constants/game";
 import useRuleModal from "@/hooks/useRuleModal";
 import useProgram from "@/hooks/useProgram";
 import { BN } from "@coral-xyz/anchor";
-import { AppWalletState } from "@/stores/global";
 import { getAttackPDA, getGamePDA, getPlayerPDA } from "@/utils/www";
 import { gameMatchPublicKey } from "@/constants/network";
-import { PlayerState } from "@/stores/game";
-import useGetGameStatus from "@/hooks/useGetGameStatus";
 import { toast } from "react-toastify";
+import { observer } from "mobx-react-lite";
+import { store } from "@/stores/RootStore";
 
 const SelectAmount: FC = () => {
+  const { globalStore, gameStore, playerStore } = store;
   const { openModal: openRuleModal } = useRuleModal();
   const [amount, setAmount] = useState<number>(0);
-  const setPlayerState = useSetRecoilState(PlayerState);
-  const gameStatus = useGetGameStatus();
 
-  const appWallet = useRecoilValue(AppWalletState);
   const [loading, setLoading] = useState<boolean>(false);
 
   const program = useProgram();
 
   const handleJoinGame = async () => {
-    if (appWallet.publicKey) {
+    if (globalStore.publicKey) {
       setLoading(true);
       try {
         const match = await program.account.match.fetch(gameMatchPublicKey);
-        const [attackAccount] = getAttackPDA(program.programId, match.number, appWallet.publicKey);
-        const [playerAccount] = getPlayerPDA(program.programId, match.number, appWallet.publicKey);
+        const [attackAccount] = getAttackPDA(program.programId, match.number, globalStore.publicKey);
+        const [playerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
         const [game] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
       
         await program.methods
-          .join(gameStatus.fee.mul(new BN(amount)))
+          .join(gameStore.entranceFee.mul(new BN(amount)))
           .accounts({
             matchAccount: gameMatchPublicKey,
             game,
             attackAccount,
             playerAccount,
-            player: appWallet.publicKey,
+            player: globalStore.publicKey,
           })
           .rpc();
         // console.log('tx::::', tx);
         const [playerPDA] = getPlayerPDA(
           program.programId,
           match.number,
-          appWallet.publicKey,
+          globalStore.publicKey,
         );
         const player = await program.account.player.fetch(playerPDA);
-        setPlayerState({
-          lives: player.lives,
-          attacked: '',
-          points: player.points.points,
-          registered: player.registered,
-          init: true,
-        })
+        playerStore.setPlayer(player);
       } catch (error) {
         toast.error((error as Error).message);
         setLoading(false);
@@ -85,7 +75,7 @@ const SelectAmount: FC = () => {
             boxSize={'17.5rem'}
             unit={wager.unit}
             amount={wager.amount}
-            feeBase={gameStatus.fee}
+            feeBase={gameStore.entranceFee}
             selected={wager.amount === amount}
             onSelected={() => setAmount(wager.amount)}
           />
@@ -103,4 +93,4 @@ const SelectAmount: FC = () => {
   );
 }
 
-export default SelectAmount;
+export default observer(SelectAmount);

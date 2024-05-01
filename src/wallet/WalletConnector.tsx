@@ -10,20 +10,21 @@ import useInitPlayerState from '@/hooks/useInitPlayerState';
 import useInitCurrentGame from '@/hooks/useInitCurrentGame';
 import useInitCurrentPlayers from '@/hooks/useInitCurrentPlayers';
 import 'react-toastify/dist/ReactToastify.css';
+import { observer } from 'mobx-react-lite';
 
 type Props = {
   children?: React.ReactNode
 };
 
-const InitWalletLayer: FC<Props> = ({ children }) => {
+const InitWalletLayer: FC<Props> = observer(({ children }) => {
   useInitWallet();
-  useInitPlayerState();
   useInitCurrentGame();
+  useInitPlayerState();
   useInitCurrentPlayers();
   return (
     <Fragment>{children}</Fragment>
   );
-}
+})
 
 const WalletConnector: FC<Props> = ({ children }) => {
   const wallets = useMemo(

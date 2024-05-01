@@ -43,7 +43,6 @@ const ConnectWallet: FC = () => {
   const connectWalletState = useRecoilValue(ConnectWalletState);
   const resetConnectWallet = useResetRecoilState(ConnectWalletState);
   const { wallets, select } = useWallet();
-  console.log(wallets);
   return (
     <AppModal open={connectWalletState.open}>
       <Flex justifyContent="center" position="relative" minH="24rem" fontFamily="Potta One" bg="button.border" px="2.125rem" borderRadius="1rem" border="0.5rem" borderStyle="solid" borderColor="button.bg">

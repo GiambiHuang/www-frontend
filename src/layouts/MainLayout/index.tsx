@@ -8,12 +8,15 @@ import LeaderboardButton from "@/containers/LeaderboardButton";
 import GameCounter from "@/components/GameCounter";
 import ConnectWalletButton from "@/containers/ConnectWalletButton";
 import useLeaderboardModal from "@/hooks/useLeaderboardModal";
-import useGetGameStatus from "@/hooks/useGetGameStatus";
+import { observer } from "mobx-react-lite";
+import { store } from "@/stores/RootStore";
 
 const MainLayout: React.FC = () => {
+  const { gameStore } = store;
   const { openModal } = useLeaderboardModal();
-  const gameStatus = useGetGameStatus();
 
+  console.log(gameStore.joinTime - gameStore.currentTime);
+  console.log(gameStore.startTime - gameStore.currentTime);
   return (
     <Center h={'100vh'} position={'relative'} w={'100vw'}>
       <Flex w={'100%'} position={'absolute'} top={0}>
@@ -22,9 +25,9 @@ const MainLayout: React.FC = () => {
         </Center>
         <Box textAlign="center" padding="1rem 2rem 0.5rem" bg="rgba(0, 0, 0, 13%)" borderBottomRadius="1rem">
           <GameCounter
-            isOver={!gameStatus.game.ableToJoin}
-            now={gameStatus.time.current}
-            startFrom={gameStatus.time.start}
+            isOver={!gameStore.ableToJoin}
+            now={gameStore.currentTime}
+            startFrom={gameStore.startTime}
           />
         </Box>
         <Flex flex={1} justifyContent={'flex-end'} alignItems={'flex-end'}>
@@ -41,4 +44,4 @@ const MainLayout: React.FC = () => {
   );
 };
 
-export default MainLayout;
+export default observer(MainLayout);

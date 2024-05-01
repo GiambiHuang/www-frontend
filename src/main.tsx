@@ -93,21 +93,21 @@ const customTheme = extendTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ChakraProvider theme={customTheme}>
-        <RecoilRoot>
-          <WalletConnector>
-              <BrowserRouter>
-                <Routes>
-                  <Route element={<MainLayout />}>
-                    <Route path="/" element={<App />} />
-                    <Route path="/start" element={<Start />} />
-                  </Route>
-                  <Route element={<GameLayout />}>
-                    <Route path="/game" element={<Game />} />
-                  </Route>
-                </Routes>
-              </BrowserRouter>
-          </WalletConnector>
-        </RecoilRoot>
+      <RecoilRoot>
+        <WalletConnector>
+            <BrowserRouter>
+              <Routes>
+                <Route element={<MainLayout />}>
+                  <Route path="/" element={<App />} />
+                  <Route path="/start" element={<Start />} />
+                </Route>
+                <Route element={<GameLayout />}>
+                  <Route path="/game" element={<Game />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+        </WalletConnector>
+      </RecoilRoot>
     </ChakraProvider>
   </React.StrictMode>,
 )

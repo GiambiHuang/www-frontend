@@ -6,10 +6,9 @@ import useRuleModal from "@/hooks/useRuleModal";
 import Logo from '@/assets/images/logo-main.svg?react';
 import { useNavigate } from "react-router-dom";
 import backgroundImg from '@/assets/images/background.webp';
-import { AppWalletState } from '@/stores/global';
-import { useRecoilValue } from 'recoil';
 import useConnectModal from '@/hooks/useConnectModal';
-import useGetGameStatus from '@/hooks/useGetGameStatus';
+import { observer } from 'mobx-react-lite';
+import { store } from '@/stores/RootStore';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -19,25 +18,24 @@ const AppContainer = styled.div`
 `;
 
 const App: FC = () => {
+  const { globalStore, gameStore } = store;
   const { openModal: openRuleModal } = useRuleModal();
   const { openModal: openConnectModal } = useConnectModal();
   const navigate = useNavigate();
-  const gameStatus = useGetGameStatus();
-
-  const appWallet = useRecoilValue(AppWalletState);
 
   const handlePlay = useCallback(() => {
-    if (appWallet.connected) {
+    if (globalStore.connected) {
       navigate('/start');
     } else {
       openConnectModal();
     }
-  }, [appWallet.connected]);
+  }, [globalStore.connected]);
 
   const canJoin = useMemo(() =>
-    gameStatus.game.ableToJoin && gameStatus.game.init,
-    [gameStatus.game]
+    gameStore.ableToJoin && gameStore.init,
+    [gameStore.ableToJoin, gameStore.init]
   );
+
   return (
     <AppContainer>
       <Center minH={'calc(100vh - 12.5rem)'} alignItems={'flex-start'}>
@@ -59,4 +57,4 @@ const App: FC = () => {
   )
 }
 
-export default App
+export default observer(App);

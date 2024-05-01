@@ -1,5 +1,4 @@
 import { FC, Fragment, useEffect, useMemo, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 import { web3 } from '@coral-xyz/anchor';
 import { useNavigate } from 'react-router-dom';
 import { Center, chakra, Flex, Grid, GridItem } from '@chakra-ui/react';
@@ -15,13 +14,12 @@ import { gameMatchPublicKey } from '@/constants/network';
 import { getAttackPDA, getGamePDA, getPlayerPDA } from '@/utils/www';
 import useResetGame from '@/hooks/useResetGame';
 import PendingScreen from '@/modals/PendingScreen';
-import useGetGameStatus from '@/hooks/useGetGameStatus';
-import { AppWalletState } from '@/stores/global'
 import { toast } from 'react-toastify';
+import { observer } from 'mobx-react-lite';
+import { store } from '@/stores/RootStore';
 
 const Game: FC = () => {
-  const appWallet = useRecoilValue(AppWalletState);
-  const gameStatus = useGetGameStatus();
+  const { globalStore, gameStore, playerStore, playersStore } = store;
   const navigate = useNavigate();
   const program = useProgram();
   const reset = useResetGame();
@@ -29,15 +27,15 @@ const Game: FC = () => {
   const [selected, setSelected] = useState<string>('');
 
   const handleAttackPlayer = async (publicKey: string) => {
-    if (appWallet.publicKey) {
+    if (globalStore.publicKey) {
       setSelected('');
       setPending(true);
       const match = await program.account.match.fetch(gameMatchPublicKey);
       const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
       
       const targetPublicKey = new web3.PublicKey(publicKey);
-      const [attackAccount] = getAttackPDA(program.programId, match.number, appWallet.publicKey);
-      const [playerAccount] = getPlayerPDA(program.programId, match.number, appWallet.publicKey);
+      const [attackAccount] = getAttackPDA(program.programId, match.number, globalStore.publicKey);
+      const [playerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
       const [targetAccount] = getPlayerPDA(program.programId, match.number, targetPublicKey);
       try {
         await program.methods
@@ -48,7 +46,7 @@ const Game: FC = () => {
             attackAccount,
             playerAccount,
             targetAccount,
-            player: appWallet.publicKey,
+            player: globalStore.publicKey,
           })
           .rpc();
         
@@ -61,11 +59,11 @@ const Game: FC = () => {
   }
 
   const handleFinishGame = async () => {
-    if (appWallet.publicKey) {
-      if (gameStatus.player.win) {
+    if (globalStore.publicKey) {
+      if (playersStore.winner === globalStore.publicKey.toString()) {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
-        const [winnerAccount] = getPlayerPDA(program.programId, match.number, appWallet.publicKey);
+        const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
         try {
           await program.methods
             .finish()
@@ -73,7 +71,7 @@ const Game: FC = () => {
               matchAccount: gameMatchPublicKey,
               gameAccount,
               winnerAccount,
-              winner: appWallet.publicKey,
+              winner: globalStore.publicKey,
             })
             .rpc();
             reset();
@@ -91,19 +89,19 @@ const Game: FC = () => {
   }
 
   const livePlayers = useMemo(() =>
-    Object.entries(gameStatus.players.list)
-      .filter(([_, player]) => !!player.lives)
+    Object.entries(playersStore.list)
+      .filter(([publicKey]) => !playersStore.deadList[publicKey])
       .map(([publicKey]) => publicKey)
-  , [gameStatus.players.dead]);
+  , [playersStore.deadList, playersStore.list]);
 
   const selectablePlayers = useMemo(() =>
-    livePlayers.filter(publicKey => publicKey !== (appWallet.publicKey?.toString() ?? ''))
-  , [livePlayers, appWallet.publicKey]);
+    livePlayers.filter(publicKey => publicKey !== (globalStore.publicKey?.toString() ?? ''))
+  , [livePlayers, globalStore.publicKey]);
 
   const renderContent = () => {
-    const { game, player, players } = gameStatus;
-    const allInit = game.init && player.init && players.init;
-    if (allInit && game.started) {
+    const allInit = gameStore.init && playerStore.init && playersStore.init;
+    if (allInit && gameStore.started) {
+      const publickKey = globalStore.publicKey?.toString() ?? '';
       return (
         <Fragment>
           <Grid
@@ -117,17 +115,17 @@ const Game: FC = () => {
             <GridItem fontFamily={'Potta One'} as={Center} rowSpan={1} colSpan={1}>
               <chakra.svg flex={1} textShadow={'0 0.25rem 0.25rem rgba(0, 0, 0, 0.25)'} width="200px" fontSize={'10rem'} height="220" viewBox="0 0 200 221" xmlns="http://www.w3.org/2000/svg">
                 <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" strokeWidth="2rem" paintOrder="stroke" stroke="#2F6B75">
-                  {gameStatus.round.remainingAttackTime}
+                  {gameStore.round.remainingAttackTime}
                 </text>
               </chakra.svg>
             </GridItem>
             <GridItem as={Center} rowSpan={1} colSpan={2}>
-              <Arena players={livePlayers} onClick={handleAttackPlayer} me={appWallet.publicKey?.toString() ?? ''} />
+              <Arena players={livePlayers} onClick={handleAttackPlayer} me={publickKey} />
             </GridItem>
           </Grid>
-          {gameStatus.player.dead && <LoserModal attacker={gameStatus.player.attacker} onFinish={handleFinishGame} />}
-          {gameStatus.player.win && <WinnerModal onFinish={handleFinishGame} />}
-          {!gameStatus.player.win && !gameStatus.player.dead && gameStatus.round.break && <NextRound />}
+          {playersStore.deadList[publickKey] && <LoserModal attacker={playersStore.deadList[publickKey].attacker} onFinish={handleFinishGame} />}
+          {playersStore.winner && <WinnerModal onFinish={handleFinishGame} />}
+          {!playersStore.winner && !playersStore.deadList[publickKey] && gameStore.round.break && <NextRound />}
           {pending && <PendingScreen target={selected} />}
         </Fragment>
       );
@@ -136,18 +134,17 @@ const Game: FC = () => {
   }
 
   useEffect(() => {
-    const { game, player, players } = gameStatus;
-    const allInit = game.init && player.init && players.init;
-    if (allInit && game.finished) {
+    const allInit = gameStore.init && playerStore.init && playersStore.init;
+    if (allInit && (gameStore.finished || !gameStore.started)) {
       navigate('/');
     }
-  }, [gameStatus]);
+  }, [gameStore.init, gameStore.finished, gameStore.started, playerStore.init, playersStore.init]);
 
   useEffect(() => {
-    if (gameStatus.round.number > 0) {
+    if (gameStore.round.num > 0) {
       setPending(false);
     }
-  }, [gameStatus.round.number]);
+  }, [gameStore.round.num]);
 
   return (
     <Flex flexDirection={'column'} minH={'100vh'} w={'100%'} bgImage={backgroundImg} bgPos={'center'} bgSize={'cover'} bgRepeat={'no-repeat'}>
@@ -156,4 +153,4 @@ const Game: FC = () => {
   )
 }
 
-export default Game
+export default observer(Game)

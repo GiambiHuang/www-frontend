@@ -1,9 +1,8 @@
-import { DeadPlayer } from "@/stores/game";
 import { shortAddress } from "@/utils/shortAddress";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import { FC } from "react";
 
-const DeadList: FC<{ list: DeadPlayer[] }> = ({ list }) => {
+const DeadList: FC<{ list: any[] }> = ({ list }) => {
   return (
     <Flex justifyContent="center" position="relative" maxW={'21.25rem'} w={'100%'} pt={'3rem'} pb={'1.875rem'} bg="button.border" px="1.25rem" borderRadius="1rem" border="0.375rem" borderStyle="solid" borderColor="button.bg">
       <Box

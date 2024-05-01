@@ -2,29 +2,26 @@ import { Box, Flex, chakra, Text, Center } from "@chakra-ui/react";
 import { FC, useEffect, useMemo } from "react";
 import backgroundImg from '@/assets/images/background-start.webp';
 import AppModal from "@/components/AppModal";
-import { useRecoilValue } from "recoil";
-import { PlayerState } from "@/stores/game";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useNavigate } from "react-router-dom";
-import useGetGameStatus from "@/hooks/useGetGameStatus";
+import { observer } from "mobx-react-lite";
+import { store } from "@/stores/RootStore";
 dayjs.extend(duration);
 
-
 const ReadyToPlay: FC = () => {
-  const playerState = useRecoilValue(PlayerState);
+  const { gameStore, playerStore } = store;
   const navigate = useNavigate();
-  const gameStatus = useGetGameStatus();
 
   const countdown = useMemo(() => {
-    return Math.max(dayjs.duration(gameStatus.time.start - gameStatus.time.current).asSeconds(), 0);
-  }, [gameStatus.time]);
+    return Math.max(dayjs.duration(gameStore.startTime - gameStore.currentTime).asSeconds(), 0);
+  }, [gameStore.currentTime]);
 
   useEffect(() => {
-    if (gameStatus.game.started) {
+    if (gameStore.started) {
       navigate('/game');
     }
-  }, [gameStatus.game.started]);
+  }, [gameStore.started]);
 
   return (
     <Flex flex={1} mt={'8.5rem'} flexDirection={'column'} alignItems={'center'}>
@@ -36,7 +33,7 @@ const ReadyToPlay: FC = () => {
         </chakra.svg>
       </Box>
       <Box textAlign={'center'} fontSize={'1.5rem'} lineHeight={'1.75rem'}>
-        <Text>You've chosen {playerState.lives} wagers to participate in this game.</Text>
+        <Text>You've chosen {playerStore.me.lives} wagers to participate in this game.</Text>
         <Text>Please wait patiently, the game will start soon!</Text>
       </Box>
       <AppModal open={countdown <= 60} motionPreset="none">
@@ -53,4 +50,4 @@ const ReadyToPlay: FC = () => {
   );
 }
 
-export default ReadyToPlay;
+export default observer(ReadyToPlay);

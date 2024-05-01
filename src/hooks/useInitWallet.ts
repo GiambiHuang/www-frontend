@@ -1,16 +1,14 @@
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useSetRecoilState } from "recoil";
 
-import { AppWalletState } from "@/stores/global";
 import { useEffect } from "react";
 import useConnectModal from "./useConnectModal";
+import { store } from "@/stores/RootStore";
 // import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 
 const useInitWallet = () => {
-  const setAppWalletState = useSetRecoilState(AppWalletState);
+  const { globalStore } = store;
   const { closeModal } = useConnectModal();
   const { publicKey, connected } = useWallet();
-
   // const testFunc = async () => {
   //   if (publicKey) {
   //     const balance = await connection.getBalance(publicKey);
@@ -34,11 +32,7 @@ const useInitWallet = () => {
   //   }
   // }
   useEffect(() => {
-    setAppWalletState({
-      publicKey: publicKey || null,
-      twitter: '',
-      connected,
-    })
+    globalStore.setWallet(publicKey, connected)
     if (connected) {
       closeModal();
     }

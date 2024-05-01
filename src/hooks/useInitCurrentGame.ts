@@ -1,11 +1,10 @@
-import { useSetRecoilState } from "recoil";
 import { useCallback, useEffect, useRef } from "react";
-import { getGame, getTimestamp } from "@/apis/game";
+import { GetGameResult, getGame, getTimestamp } from "@/apis/game";
 import { usePageVisibility } from 'react-page-visibility';
-import { CurrentGameState } from "@/stores/game";
+import { store } from "@/stores/RootStore";
 
 const useInitCurrentGame = () => {
-  const setCurrentGame = useSetRecoilState(CurrentGameState);
+  const { gameStore } = store;
   const ref = useRef<NodeJS.Timeout | null>(null);
   const isVisible = usePageVisibility();
   
@@ -17,25 +16,14 @@ const useInitCurrentGame = () => {
       getGame(),
       getTimestamp(),
     ]);
+    gameStore.setGame(game as GetGameResult, currentTime);
     if (game) {
-      const { startTime, config, state, firstShooter, survivors } = game;
-      setCurrentGame({
-        init: true,
-        currentTime,
-        joinTime: startTime.toNumber() * 1000,
-        startTime: (startTime.toNumber() + config.stakingCooldown) * 1000,
-        finished: !!state.finished,
-        roundDuration: config.roundDuration.toNumber(),
-        roundSettlement: config.roundSettlementDuration.toNumber(),
-        entranceFee: config.entranceFee,
-        firstShooter: firstShooter,
-        survivors: survivors,
-      })
+      const { state } = game;
       if (!state.finished) {
         ref.current && clearInterval(ref.current);
         ref.current = setInterval(() => {
           // update current time
-          getTimestamp().then(currentTime => setCurrentGame(state => ({ ...state, currentTime, started: currentTime >= startTime.toNumber() })))
+          getTimestamp().then(currentTime => gameStore.updateTime(currentTime))
         }, 1000);
       }
     }

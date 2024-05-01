@@ -6,8 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import backgroundImg from '@/assets/images/background-start.webp';
 import SelectAmount from './SelectAmount';
 import ReadyToPlay from './ReadyToPlay';
-import useGetGameStatus from '@/hooks/useGetGameStatus';
 import PendingScreen from '@/modals/PendingScreen';
+import { store } from '@/stores/RootStore';
+import { observer } from 'mobx-react-lite';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -17,21 +18,21 @@ const AppContainer = styled.div`
 `;
 
 const Start: FC = () => {
-  const gameStatus = useGetGameStatus();
+  const { gameStore, playerStore } = store;
   const navigate = useNavigate();
 
   const renderContent = () => {
-    if (gameStatus.game.init && gameStatus.player.init) {
-      return gameStatus.player.registered ? <ReadyToPlay /> : <SelectAmount />;
+    if (gameStore.init && playerStore.init) {
+      return playerStore.registered ? <ReadyToPlay /> : <SelectAmount />;
     }
     return <PendingScreen />;
   }
 
   useEffect(() => {
-    if (!gameStatus.game.ableToJoin) {
+    if (!gameStore.ableToJoin) {
       navigate('/');
     }
-  }, [gameStatus.game]);
+  }, [gameStore.ableToJoin]);
 
   return (
     <AppContainer>
@@ -42,4 +43,4 @@ const Start: FC = () => {
   )
 }
 
-export default Start;
+export default observer(Start);

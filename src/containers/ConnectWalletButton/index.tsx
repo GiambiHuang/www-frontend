@@ -1,16 +1,16 @@
 import useConnectModal from "@/hooks/useConnectModal";
-import { AppWalletState } from "@/stores/global";
+import { store } from "@/stores/RootStore";
 import { shortAddress } from "@/utils/shortAddress";
 import { Button, Center } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { observer } from "mobx-react-lite";
 import { FC, useCallback, useMemo } from "react";
-import { useRecoilValue } from "recoil";
 
 const ConnectWalletButton: FC = () => {
-  const appWallet = useRecoilValue(AppWalletState);
+  const { globalStore } = store;
   const { connecting } = useWallet();
   const { openModal } = useConnectModal();
-  const publicKey = useMemo(() => appWallet.publicKey && shortAddress(appWallet.publicKey.toString(), 4, 4), [appWallet.publicKey]);
+  const publicKey = useMemo(() => globalStore.publicKey && shortAddress(globalStore.publicKey.toString(), 4, 4), [globalStore.publicKey]);
 
   const handleClick = useCallback(() => {
     if (!connecting) {
@@ -41,4 +41,4 @@ const ConnectWalletButton: FC = () => {
   );
 }
 
-export default ConnectWalletButton;
+export default observer(ConnectWalletButton);

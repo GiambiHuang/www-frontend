@@ -1,55 +1,38 @@
-import { useRecoilValue, useResetRecoilState, useSetRecoilState } from "recoil";
 import { usePageVisibility } from 'react-page-visibility';
 
-import { PlayerState } from "@/stores/game";
 import { useCallback, useEffect } from "react";
-import { AppWalletState } from "@/stores/global";
 import useProgram from "./useProgram";
 import { getPlayerPDA } from "@/utils/www";
 import { gameMatchPublicKey } from "@/constants/network";
-import useGetGameStatus from "./useGetGameStatus";
+import { store } from "@/stores/RootStore";
 
 const useInitPlayerState = () => {
-  const appWallet = useRecoilValue(AppWalletState);
-  const setPlayerState = useSetRecoilState(PlayerState);
-  const resetPlayerState = useResetRecoilState(PlayerState);
-  const gameStatus = useGetGameStatus();
+  const { globalStore, playerStore, gameStore } = store;
   const program = useProgram();
   const isVisible = usePageVisibility();
 
   const handleFetchPlayer = useCallback(async () => {
-    if (appWallet.publicKey && !gameStatus.game.finished && (isVisible || gameStatus.round.break)) {
+    if (globalStore.publicKey && !gameStore.finished && (isVisible || gameStore.round.break)) {
       try {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [playerPDA] = getPlayerPDA(
           program.programId,
           match.number,
-          appWallet.publicKey,
+          globalStore.publicKey,
         );
         try {
           const player = await program.account.player.fetch(playerPDA);
-          setPlayerState({
-            lives: player.lives,
-            attacked: '',
-            points: player.points.points,
-            registered: player.registered,
-            init: true,
-          })
+          playerStore.setPlayer(player);
         } catch (error) {
-          setPlayerState({
-            lives: 0,
-            attacked: '',
-            points: 0,
-            registered: false,
-            init: true,
-          })
+          playerStore.setPlayer(null);
         }
       } catch (error) {
         console.log(error);
-        resetPlayerState();
+        playerStore.setPlayer(null);
+        // resetPlayerState();
       }
     }
-  }, [appWallet.publicKey, isVisible, gameStatus.game.finished, gameStatus.round.break]);
+  }, [globalStore.publicKey, isVisible, gameStore.finished, gameStore.round.break]);
 
   useEffect(() => {
     handleFetchPlayer();
@@ -57,4 +40,3 @@ const useInitPlayerState = () => {
 }
 
 export default useInitPlayerState;
-

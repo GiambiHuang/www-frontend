@@ -1,54 +1,43 @@
-import { getCurrentPlayers, getDeadPlayers } from "@/apis/game";
-import { GamePlayersState, Player } from "@/stores/game";
+import { getCurrentPlayers, getDeadPlayers, getGame } from "@/apis/game";
 import { useCallback, useEffect } from "react";
-import { useSetRecoilState } from "recoil";
-import useGetGameStatus from "./useGetGameStatus";
+import { store } from "@/stores/RootStore";
+import { Player } from "@/stores/PlayersStore";
 
 const useInitCurrentPlayers = () => {
-  const gameStatus = useGetGameStatus();
-  const setGamePlayersState = useSetRecoilState(GamePlayersState)
-
+  const { playersStore, gameStore } = store;
   const fetchCurrentPlayers = useCallback(async () => {
-    if (gameStatus.game.started) {
-      const currentPlayers = await getCurrentPlayers();
-      const players = {} as Record<string, Player>;
-      for (const player of currentPlayers) {
-        players[player.publicKey.toString()] = {
-          lives: player.lives || 0,
-          attacked: player.attacked,
+    if (gameStore.init) {
+      // if (gameStore.started) {
+        try {
+          const currentPlayers = await getCurrentPlayers();
+          const players = {} as Record<string, Player>;
+          for (const player of currentPlayers) {
+            players[player.publicKey.toString()] = {
+              lives: player.lives || 0,
+              attacked: player.attacked,
+            }
+          }
+          playersStore.setPlayers(players)
+        } catch (error) {
+          playersStore.setPlayers({});
         }
-      }
-      setGamePlayersState(state => {
-        return {
-          init: true,
-          players,
-          deadList: state.deadList.map(dead => ({ ...dead })),
-        }
-      })
+      // } else {
+      //   playersStore.setPlayers({});
+      // }
     }
-  }, [gameStatus.game.started]);
+  }, [gameStore.started, gameStore.init]);
 
   const fetchDeadPlayers = useCallback(async () => {
-    if (gameStatus.round.break && gameStatus.players.init) {
-      const deadList = await getDeadPlayers();
-      setGamePlayersState(state => {
-        const newPlayers = {} as Record<string, Player>;
-        Object
-          .keys(state.players)
-          .forEach(publicKey => {
-            newPlayers[publicKey] = { ...state.players[publicKey] }
-          })
-        for (const deadPlayer of deadList) {
-          newPlayers[deadPlayer.player] && (newPlayers[deadPlayer.player].lives = 0)
-        }
-        return {
-          init: state.init,
-          players: newPlayers,
-          deadList,
-        }
-      })
+    if (gameStore.round.break && playersStore.init) {
+      const [deadList, game] = await Promise.all([
+        getDeadPlayers(),
+        getGame(),
+      ])
+      console.log(deadList, game?.firstShooter)
+      gameStore.setFirstShooter(game?.firstShooter ?? '');
+      playersStore.setDeadPlayers(deadList);
     }
-  }, [gameStatus.round.break, gameStatus.players.init])
+  }, [gameStore.round.break, playersStore.init])
 
   useEffect(() => {
     fetchCurrentPlayers();

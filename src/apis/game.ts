@@ -1,5 +1,5 @@
 import { endpoint, gameMatchPublicKey, programId } from "@/constants/network";
-import { BorshCoder, EventParser, Program, web3 } from "@coral-xyz/anchor";
+import { BN, BorshCoder, EventParser, Program, web3 } from "@coral-xyz/anchor";
 import { Connection } from "@solana/web3.js";
 
 import { IDL } from "@/contracts/www";
@@ -11,6 +11,22 @@ window.Buffer = buffer.Buffer;
 const connection = new Connection(endpoint, 'processed')
 const anonymousProgram = new Program(IDL, programId, { connection });
 
+export type GetGameResult = {
+  config: {
+    stakingCooldown: number;
+    roundDuration: BN;
+    roundSettlementDuration: BN;
+    entranceFee: BN;
+  },
+  startTime: BN,
+  state: {
+    finished?: {};
+    live?: {};
+  },
+  survivors: number,
+  firstShooter: string,
+}
+
 export const getGame = async () => {
   try {
     const match = await anonymousProgram.account.match.fetch(gameMatchPublicKey);
@@ -20,6 +36,7 @@ export const getGame = async () => {
       gameMatchPublicKey,
     );
     const game = await anonymousProgram.account.game.fetch(gamePDA);
+    console.log(game);
     return {
       config: match.gameCfg,
       startTime: game.startTime,
@@ -28,6 +45,7 @@ export const getGame = async () => {
       firstShooter: game.round.firstShooter.toString(),
     }
   } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -39,17 +57,28 @@ export const getTimestamp = async () => {
 }
 
 export const getCurrentPlayers = async () => {
-  const connection = new Connection(endpoint, 'confirmed')
-  const sign = await connection.getSignaturesForAddress(anonymousProgram.programId);
-  const txns = await connection.getTransactions(sign.map(s => s.signature));
+  const connection = new Connection(endpoint, 'confirmed');
+  const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
+  // const slot = await connection.getSlot();
+  // // get the latest block (allowing for v0 transactions)
+  // const block = await connection.getBlock(slot, {
+  //   maxSupportedTransactionVersion: 0,
+  // });
+  const signs = await connection.getSignaturesForAddress(anonymousProgram.programId, { until: '3bgaGduMVZrpx7wFBzhxY39CNpiv4t7BXqSw3zF5dGL6fDQhesnASKrQZZt9uKeoesN5tngeqxDWtXWPcNQQBows' });
+  const signatures = signs.map(s => s.signature);
+  const txns = await connection.getTransactions(
+    signatures,
+    {
+      maxSupportedTransactionVersion: 0,
+    },
+  );
   const match = await anonymousProgram.account.match.fetch(gameMatchPublicKey);
   const game = await getGame();
 
-  const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
   const playerPDAs = [];
   const playerPublicKeys = [];
   for (const txn of txns) {
-    const { blockTime, meta } = txn || {} ;
+    const { blockTime, meta } = txn || {};
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
     if (value?.name === 'JoinEvent' && (game?.startTime.toNumber() ?? 0) < (blockTime || 0)) {
@@ -69,8 +98,13 @@ export const getCurrentPlayers = async () => {
 
 export const getDeadPlayers = async () => {
   const connection = new Connection(endpoint, 'confirmed')
-  const sign = await connection.getSignaturesForAddress(anonymousProgram.programId);
-  const txns = await connection.getTransactions(sign.map(s => s.signature));
+  const sign = await connection.getSignaturesForAddress(anonymousProgram.programId, { until: '3bgaGduMVZrpx7wFBzhxY39CNpiv4t7BXqSw3zF5dGL6fDQhesnASKrQZZt9uKeoesN5tngeqxDWtXWPcNQQBows' });
+  const txns = await connection.getTransactions(
+    sign.map(s => s.signature),
+    {
+      maxSupportedTransactionVersion: 0,
+    },
+  );
   const game = await getGame();
 
   const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
