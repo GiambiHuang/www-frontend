@@ -7,7 +7,7 @@ const useInitCurrentGame = () => {
   const { gameStore } = store;
   const ref = useRef<NodeJS.Timeout | null>(null);
   const isVisible = usePageVisibility();
-  
+
   const fetchCurrentGame = useCallback(async () => {
     const [
       game,
@@ -23,14 +23,17 @@ const useInitCurrentGame = () => {
         ref.current && clearInterval(ref.current);
         ref.current = setInterval(() => {
           // update current time
-          getTimestamp().then(currentTime => gameStore.updateTime(currentTime))
+          // gameStore.updateTime(Date.now());
+          getTimestamp().then(currentTime => {
+            gameStore.updateTime(currentTime);
+          })
         }, 1000);
       }
     }
   }, []);
 
   useEffect(() => {
-    return () => { ref.current && clearInterval(ref.current); }
+    return () => { ref.current && clearTimeout(ref.current); }
   }, []);
 
   useEffect(() => {

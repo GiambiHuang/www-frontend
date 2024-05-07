@@ -38,11 +38,12 @@ export class GameStore {
 
   get round () {
     const timeAfterStart = Math.max(Math.floor((this.currentTime - this.startTime) / 1000), 0);
-    const roundNumber = Math.floor(timeAfterStart / Math.max(this.roundDuration + this.roundSettlement, 1));
+    const singleRoundDuration = this.roundDuration;
+    const roundNumber = Math.floor(timeAfterStart / Math.max(singleRoundDuration, 1));
 
-    const singleRoundDuration = this.roundDuration + this.roundSettlement;
+    const activeTime = this.roundDuration - this.roundSettlement;
     // remainingActiveTime: for attack.
-    const remainingAttackTime = Math.max(this.roundDuration - (timeAfterStart % singleRoundDuration), 0);
+    const remainingAttackTime = Math.max(activeTime - (timeAfterStart % singleRoundDuration), 0);
     // remainingSettlementTime: for checking dead list.
     const remainingSettlementTime = Math.min(this.roundSettlement, singleRoundDuration - (timeAfterStart % singleRoundDuration));
     return {

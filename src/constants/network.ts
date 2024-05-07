@@ -9,6 +9,6 @@ export const endpoint = 'https://testnet.dev2.eclipsenetwork.xyz/';
 
 // export const programId = 'DKFmaoLpqpc6TFyNwQBRXZhYSqbFctaJqFn9z3xha9ue';
 
-export const programId = 'CkcTQWfSpQ8t455fzYhd4vfnpRbN4ZME6w7iJHgfxXky';
+export const programId = 'J4HJnEs5n2mQ8NFK8Rt9we5vQYuB8owXSMsLf46SxNFT';
 // export const gamePublicKey = new web3.PublicKey('GArUSk4zCdmZJsx9bVF8vTawnJuwbemmSZ11PX2pLAru');
-export const gameMatchPublicKey = new web3.PublicKey('GokXkjigSyqRQU7w5TrwUUcjpkraid21k7PUwQ2mFJiP');
+export const gameMatchPublicKey = new web3.PublicKey('AiUnUWsLKAyF4gZc3HkiupEPgeNCnddgE8TDxkaosySE');

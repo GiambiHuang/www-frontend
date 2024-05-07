@@ -57,6 +57,51 @@ export type Www = {
       ]
     },
     {
+      "name": "updateMatch",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "matchAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": "u64"
+        },
+        {
+          "name": "stakingCooldown",
+          "type": "i16"
+        },
+        {
+          "name": "initCooldown",
+          "type": "i64"
+        },
+        {
+          "name": "entranceFee",
+          "type": "u64"
+        },
+        {
+          "name": "roundDuration",
+          "type": "i64"
+        },
+        {
+          "name": "maxStartDelay",
+          "type": "i64"
+        },
+        {
+          "name": "roundSettlementDuration",
+          "type": "i64"
+        }
+      ]
+    },
+    {
       "name": "createMatch",
       "accounts": [
         {
@@ -66,27 +111,6 @@ export type Www = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "setTestMode",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "isTest",
-          "type": "bool"
-        }
-      ]
     },
     {
       "name": "startGame",
@@ -266,6 +290,36 @@ export type Www = {
   ],
   "accounts": [
     {
+      "name": "match",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "number",
+            "type": "u32"
+          },
+          {
+            "name": "initTmp",
+            "type": "i64"
+          },
+          {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
+            "name": "earned",
+            "type": "u64"
+          },
+          {
+            "name": "gameCfg",
+            "type": {
+              "defined": "GameCfg"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "game",
       "type": {
         "kind": "struct",
@@ -305,36 +359,6 @@ export type Www = {
           {
             "name": "rentExempt",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "match",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "number",
-            "type": "u32"
-          },
-          {
-            "name": "initTmp",
-            "type": "i64"
-          },
-          {
-            "name": "admin",
-            "type": "publicKey"
-          },
-          {
-            "name": "earned",
-            "type": "u64"
-          },
-          {
-            "name": "gameCfg",
-            "type": {
-              "defined": "GameCfg"
-            }
           }
         ]
       }
@@ -410,30 +434,10 @@ export type Www = {
   ],
   "types": [
     {
-      "name": "Round",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "firstShooter",
-            "type": "publicKey"
-          },
-          {
-            "name": "firstShotTmp",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "GameCfg",
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "testMode",
-            "type": "bool"
-          },
           {
             "name": "fee",
             "type": "u64"
@@ -460,6 +464,22 @@ export type Www = {
           },
           {
             "name": "roundSettlementDuration",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Round",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "firstShooter",
+            "type": "publicKey"
+          },
+          {
+            "name": "firstShotTmp",
             "type": "i64"
           }
         ]
@@ -610,7 +630,7 @@ export type Www = {
           "index": false
         },
         {
-          "name": "matchNumber",
+          "name": "gameMatch",
           "type": "u32",
           "index": false
         }
@@ -745,6 +765,51 @@ export const IDL: Www = {
       ]
     },
     {
+      "name": "updateMatch",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "matchAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": "u64"
+        },
+        {
+          "name": "stakingCooldown",
+          "type": "i16"
+        },
+        {
+          "name": "initCooldown",
+          "type": "i64"
+        },
+        {
+          "name": "entranceFee",
+          "type": "u64"
+        },
+        {
+          "name": "roundDuration",
+          "type": "i64"
+        },
+        {
+          "name": "maxStartDelay",
+          "type": "i64"
+        },
+        {
+          "name": "roundSettlementDuration",
+          "type": "i64"
+        }
+      ]
+    },
+    {
       "name": "createMatch",
       "accounts": [
         {
@@ -754,27 +819,6 @@ export const IDL: Www = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "setTestMode",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "isTest",
-          "type": "bool"
-        }
-      ]
     },
     {
       "name": "startGame",
@@ -954,6 +998,36 @@ export const IDL: Www = {
   ],
   "accounts": [
     {
+      "name": "match",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "number",
+            "type": "u32"
+          },
+          {
+            "name": "initTmp",
+            "type": "i64"
+          },
+          {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
+            "name": "earned",
+            "type": "u64"
+          },
+          {
+            "name": "gameCfg",
+            "type": {
+              "defined": "GameCfg"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "game",
       "type": {
         "kind": "struct",
@@ -993,36 +1067,6 @@ export const IDL: Www = {
           {
             "name": "rentExempt",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "match",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "number",
-            "type": "u32"
-          },
-          {
-            "name": "initTmp",
-            "type": "i64"
-          },
-          {
-            "name": "admin",
-            "type": "publicKey"
-          },
-          {
-            "name": "earned",
-            "type": "u64"
-          },
-          {
-            "name": "gameCfg",
-            "type": {
-              "defined": "GameCfg"
-            }
           }
         ]
       }
@@ -1098,30 +1142,10 @@ export const IDL: Www = {
   ],
   "types": [
     {
-      "name": "Round",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "firstShooter",
-            "type": "publicKey"
-          },
-          {
-            "name": "firstShotTmp",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "GameCfg",
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "testMode",
-            "type": "bool"
-          },
           {
             "name": "fee",
             "type": "u64"
@@ -1148,6 +1172,22 @@ export const IDL: Www = {
           },
           {
             "name": "roundSettlementDuration",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Round",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "firstShooter",
+            "type": "publicKey"
+          },
+          {
+            "name": "firstShotTmp",
             "type": "i64"
           }
         ]
@@ -1298,7 +1338,7 @@ export const IDL: Www = {
           "index": false
         },
         {
-          "name": "matchNumber",
+          "name": "gameMatch",
           "type": "u32",
           "index": false
         }

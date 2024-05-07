@@ -36,7 +36,6 @@ export const getGame = async () => {
       gameMatchPublicKey,
     );
     const game = await anonymousProgram.account.game.fetch(gamePDA);
-    console.log(game);
     return {
       config: match.gameCfg,
       startTime: game.startTime,
@@ -51,7 +50,7 @@ export const getGame = async () => {
 }
 
 export const getTimestamp = async () => {
-  const slot = await connection.getSlot();
+  const slot = await connection.getSlot({ commitment: 'processed' });
   const timestamp = await connection.getBlockTime(slot);
   return timestamp ? timestamp * 1000 : Date.now();
 }
