@@ -29,10 +29,10 @@ const Start: FC = () => {
   }
 
   useEffect(() => {
-    if (!gameStore.ableToJoin) {
+    if (gameStore.init && !gameStore.ableToJoin) {
       navigate('/');
     }
-  }, [gameStore.ableToJoin]);
+  }, [gameStore.init, gameStore.ableToJoin]);
 
   return (
     <AppContainer>
