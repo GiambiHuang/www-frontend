@@ -16,24 +16,23 @@ const useInitCurrentGame = () => {
       getGame(),
       getTimestamp(),
     ]);
-    gameStore.setGame(game as GetGameResult, currentTime);
+    console.log(currentTime - Date.now());
+    gameStore.setTimeDiff(Date.now(), currentTime);
+    gameStore.setGame(game as GetGameResult);
     if (game) {
       const { state } = game;
       if (!state.finished) {
         ref.current && clearInterval(ref.current);
         ref.current = setInterval(() => {
           // update current time
-          // gameStore.updateTime(Date.now());
-          getTimestamp().then(currentTime => {
-            gameStore.updateTime(currentTime);
-          })
-        }, 1000);
+          gameStore.updateTime(Date.now());
+        }, 500);
       }
     }
   }, []);
 
   useEffect(() => {
-    return () => { ref.current && clearTimeout(ref.current); }
+    return () => { ref.current && clearInterval(ref.current); }
   }, []);
 
   useEffect(() => {

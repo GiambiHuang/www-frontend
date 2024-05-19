@@ -15,8 +15,6 @@ const MainLayout: React.FC = () => {
   const { gameStore } = store;
   const { openModal } = useLeaderboardModal();
 
-  console.log(gameStore.joinTime - gameStore.currentTime);
-  console.log(gameStore.startTime - gameStore.currentTime);
   return (
     <Center h={'100vh'} position={'relative'} w={'100vw'}>
       <Flex w={'100%'} position={'absolute'} top={0}>
@@ -24,11 +22,20 @@ const MainLayout: React.FC = () => {
           <LeaderboardButton />
         </Center>
         <Box textAlign="center" padding="1rem 2rem 0.5rem" bg="rgba(0, 0, 0, 13%)" borderBottomRadius="1rem">
-          <GameCounter
-            isOver={!gameStore.ableToJoin}
-            now={gameStore.currentTime}
-            startFrom={gameStore.startTime}
-          />
+          {gameStore.started ? (
+            <GameCounter
+              isOver={!gameStore.ableToJoin}
+              now={gameStore.startTime}
+              startFrom={gameStore.currentTime}
+              starting
+            />
+            ) : (
+            <GameCounter
+              isOver={!gameStore.ableToJoin}
+              now={gameStore.currentTime}
+              startFrom={gameStore.startTime}
+            />
+          )}
         </Box>
         <Flex flex={1} justifyContent={'flex-end'} alignItems={'flex-end'}>
           <Box mb={'1.375rem'} mx={{ base: '1rem', lg: '2.625rem' }}>

@@ -6,13 +6,14 @@ interface IGameCounter {
   startFrom?: number;
   now?: number;
   isOver: boolean;
+  starting?: boolean;
 }
 
-const GameCounter: FC<IGameCounter> = ({ startFrom, now, isOver }) => {
+const GameCounter: FC<IGameCounter> = ({ startFrom, now, isOver, starting }) => {
   return (
     <Box fontSize={{ base: '2.125rem', lg: '2.5rem' }}>
       <Text mb={'0.5rem'} lineHeight={1.15}>
-        {startFrom && !isOver ? 'GAME STARTS IN' : 'GAME IS FINISHED'}
+        {starting ? 'GAME STARTING' : startFrom && !isOver ? 'GAME STARTS IN' : 'GAME IS FINISHED'}
       </Text>
       <Center w={{ base: '24rem', lg: '27.5rem' }}>
         <Countdown

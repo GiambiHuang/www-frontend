@@ -1,4 +1,4 @@
-import { getCurrentPlayers, getDeadPlayers, getGame } from "@/apis/game";
+import { getCurrentPlayers, getAttackEvents, getGame } from "@/apis/game";
 import { useCallback, useEffect } from "react";
 import { store } from "@/stores/RootStore";
 import { Player } from "@/stores/PlayersStore";
@@ -29,13 +29,12 @@ const useInitCurrentPlayers = () => {
 
   const fetchDeadPlayers = useCallback(async () => {
     if (gameStore.round.break && playersStore.init) {
-      const [deadList, game] = await Promise.all([
-        getDeadPlayers(),
+      const [playerUpdate, game] = await Promise.all([
+        getAttackEvents(),
         getGame(),
       ])
-      console.log(deadList, game?.firstShooter)
       gameStore.setFirstShooter(game?.firstShooter ?? '');
-      playersStore.setDeadPlayers(deadList);
+      playersStore.setDeadPlayers(playerUpdate);
     }
   }, [gameStore.round.break, playersStore.init])
 

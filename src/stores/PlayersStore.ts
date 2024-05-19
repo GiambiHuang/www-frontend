@@ -9,18 +9,17 @@ export type Player = {
 export class PlayersStore {
   init: boolean = false;
   list: Record<string, Player> = {};
-  dead: any[] = [];
+  dead: Record<string, string> = {};
 
   rootStore: RootStore;
   constructor (rootStore: RootStore) {
     makeAutoObservable(this, {
-      winner: computed,
-      deadList: computed,
+      isWinner: computed,
     });
     this.rootStore = rootStore;
   }
 
-  get winner () {
+  get isWinner () {
     const survivors: string[] = [];
     console.log('firstShooter:', this.rootStore.gameStore.firstShooter);
     for (const publickKey of Object.keys(this.list)) {
@@ -29,19 +28,12 @@ export class PlayersStore {
       }
     }
     if (survivors.length === 1) {
-      return survivors[0];
+      return survivors[0] === (this.rootStore.globalStore.publicKey?.toString() ?? '');
     }
     if (survivors.length === 0 && this.rootStore.gameStore.firstShooter) {
-      return this.rootStore.gameStore.firstShooter;
+      return this.rootStore.gameStore.firstShooter === (this.rootStore.globalStore.publicKey?.toString() ?? '');
     }
-    return '';
-  }
-
-  get deadList () {
-    return this.dead.reduce((prev, curr) => {
-      curr[prev.player] = prev;
-      return curr;
-    }, {} as Record<string, any>);
+    return false;
   }
 
   setPlayers (players: Record<string, Player>) {
@@ -52,20 +44,13 @@ export class PlayersStore {
     })
   }
 
-  setDeadPlayers (deadList: any[]) {
+  setDeadPlayers (playerUpdate: Record<string, string>) {
     runInAction(() => {
-      const newPlayers = {} as Record<string, Player>;
-      console.log('deadList:', deadList);
-      Object
-        .keys(this.list)
-        .forEach(publicKey => {
-          newPlayers[publicKey] = { ...this.list[publicKey] }
-        })
-      for (const deadPlayer of deadList) {
-        newPlayers[deadPlayer.player] && (newPlayers[deadPlayer.player].lives = 0);
+      for (const player of Object.keys(playerUpdate)) {
+        this.list[player].lives = 0;
+        this.list[player].attacked = playerUpdate[player];
       }
-      this.list = newPlayers;
-      this.dead = deadList;
+      this.dead = playerUpdate;
     })
   }
 
@@ -73,7 +58,7 @@ export class PlayersStore {
     runInAction(() => {
       this.init = false;
       this.list = {};
-      this.dead = [];
+      this.dead = {};
     })
   }
 }

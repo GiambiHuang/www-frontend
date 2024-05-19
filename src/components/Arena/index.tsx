@@ -22,7 +22,7 @@ const avatarMap = [
 const Arena: FC<IArena> = ({ players, me, onClick }) => {
   return (
     <Box>
-      {players.map((player, idx) => (
+      {players.filter(player => player !== me).map((player, idx) => (
         <Center
           key={player}
           pos={'relative'}
@@ -37,7 +37,7 @@ const Arena: FC<IArena> = ({ players, me, onClick }) => {
               visibility: 'visible'
             }
           }}
-          pointerEvents={me === player ? 'none' : 'auto'}
+          pointerEvents={'auto'}
           onClick={() => onClick(player)}
         >
           <Box zIndex={10} pos={'absolute'} boxSize={'3rem'} className="target-icon" visibility={'hidden'}>

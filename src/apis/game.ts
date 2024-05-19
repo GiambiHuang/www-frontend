@@ -80,6 +80,7 @@ export const getCurrentPlayers = async () => {
     const { blockTime, meta } = txn || {};
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
+    console.log(value);
     if (value?.name === 'JoinEvent' && (game?.startTime.toNumber() ?? 0) < (blockTime || 0)) {
       const publicKey = new web3.PublicKey(value?.data?.player as any);
       playerPublicKeys.push(publicKey);
@@ -95,9 +96,13 @@ export const getCurrentPlayers = async () => {
   }))
 }
 
-export const getDeadPlayers = async () => {
-  const connection = new Connection(endpoint, 'confirmed')
-  const sign = await connection.getSignaturesForAddress(anonymousProgram.programId, { until: '3bgaGduMVZrpx7wFBzhxY39CNpiv4t7BXqSw3zF5dGL6fDQhesnASKrQZZt9uKeoesN5tngeqxDWtXWPcNQQBows' });
+export const getAttackEvents = async (until?: string) => {
+  const connection = new Connection(endpoint, 'confirmed');
+  const config: Record<string, string> = {};
+  if (until) {
+    config.until = until;
+  }
+  const sign = await connection.getSignaturesForAddress(anonymousProgram.programId, config);
   const txns = await connection.getTransactions(
     sign.map(s => s.signature),
     {
@@ -107,27 +112,26 @@ export const getDeadPlayers = async () => {
   const game = await getGame();
 
   const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
-  const deadList: any[] = [];
+  const playerUpdate: Record<string, string> = {};
   for (const txn of txns) {
     const { blockTime, meta } = txn || {} ;
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
     if (value?.name === 'AttackEvent' && (game?.startTime.toNumber() || 0) < (blockTime || 0)) {
+      console.log('-----', value);
       const { attacker, target, targetLivesRemaining } = value?.data;
       if (!targetLivesRemaining) {
-        deadList.push({
-          attacker: (attacker as web3.PublicKey).toString(),
-          player: (target as web3.PublicKey).toString(),
-        })
+        playerUpdate[(target as web3.PublicKey).toString()] = (attacker as web3.PublicKey).toString()
       }
     }
   }
-  return deadList;
+  return playerUpdate;
 }
 
 export type LeaderboardPlayer = {
   publicKey: string;
   points: number;
+  streak: number;
 }
 
 export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
@@ -158,6 +162,7 @@ export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
       .map((player, idx) => ({
         publicKey: playerPublicKeys[idx],
         points: player?.points.points ?? 0,
+        streak: player?.consecutiveJoins ?? 0,
       }))
       .sort((x, y) => y.points - x.points)
   } catch (error) {

@@ -73,7 +73,7 @@ const Leaderboard: FC = () => {
                     <Img src={getNoImage(idx)} boxSize={'3.75rem'} />
                   </Td>
                   <Td textAlign={getTextAlign('PLAYER')} fontSize={'2rem'} color={'#444444'}>{shortAddress(player.publicKey, 4, 4)}</Td>
-                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>--</Td>
+                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>{player.streak}</Td>
                   <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>--</Td>
                   <Td textAlign={getTextAlign('POINTS')} fontSize={'2rem'} color={'#444444'}>{player.points}</Td>
                 </Tr>

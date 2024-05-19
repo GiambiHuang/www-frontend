@@ -60,7 +60,7 @@ const Game: FC = () => {
 
   const handleFinishGame = async () => {
     if (globalStore.publicKey) {
-      if (playersStore.winner === globalStore.publicKey.toString()) {
+      if (playersStore.isWinner) {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
         const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
@@ -81,7 +81,6 @@ const Game: FC = () => {
         }
       } else {
         setTimeout(() => {
-          reset();
           navigate('/');
         }, 5000);
       }
@@ -90,9 +89,9 @@ const Game: FC = () => {
 
   const livePlayers = useMemo(() =>
     Object.entries(playersStore.list)
-      .filter(([publicKey]) => !playersStore.deadList[publicKey])
+      .filter(([_, player]) => player.lives > 0)
       .map(([publicKey]) => publicKey)
-  , [playersStore.deadList, playersStore.list]);
+  , [playersStore.dead, playersStore.list]);
 
   const selectablePlayers = useMemo(() =>
     livePlayers.filter(publicKey => publicKey !== (globalStore.publicKey?.toString() ?? ''))
@@ -123,9 +122,9 @@ const Game: FC = () => {
               <Arena players={livePlayers} onClick={handleAttackPlayer} me={publickKey} />
             </GridItem>
           </Grid>
-          {playersStore.deadList[publickKey] && <LoserModal attacker={playersStore.deadList[publickKey].attacker} onFinish={handleFinishGame} />}
-          {playersStore.winner && <WinnerModal onFinish={handleFinishGame} />}
-          {!playersStore.winner && !playersStore.deadList[publickKey] && gameStore.round.break && <NextRound />}
+          {playersStore.dead[publickKey] && <LoserModal attacker={playersStore.dead[publickKey]} onFinish={handleFinishGame} />}
+          {playersStore.isWinner  && <WinnerModal onFinish={handleFinishGame} />}
+          {!playersStore.isWinner && !playersStore.dead[publickKey] && gameStore.round.break && <NextRound />}
           {pending && <PendingScreen target={selected} />}
         </Fragment>
       );

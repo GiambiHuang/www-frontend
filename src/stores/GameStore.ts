@@ -18,6 +18,11 @@ export class GameStore {
 
   firstShooter: string = '';
 
+  timeDiff = {
+    browserTime: 0,
+    sysTime: 0,
+  }
+
   rootStore: RootStore;
   constructor (rootStore: RootStore) {
     makeAutoObservable(this, {
@@ -60,10 +65,19 @@ export class GameStore {
     })
   }
 
-  setGame (game: GetGameResult | null, timestamp: number) {
+  setTimeDiff (browserTime: number, sysTime: number) {
+    runInAction(() => {
+      this.timeDiff = {
+        browserTime,
+        sysTime,
+      }
+    })
+  }
+
+  setGame (game: GetGameResult | null) {
     runInAction(() => {
       this.init = true;
-      this.currentTime = timestamp;
+      // this.currentTime = timestamp;
       if (game) {
         this.startTime = (game.startTime.toNumber() + game.config.stakingCooldown) * 1000;
         this.joinTime = game.startTime.toNumber() * 1000;
@@ -85,7 +99,7 @@ export class GameStore {
 
   updateTime (timestamp: number) {
     runInAction(() => {
-      this.currentTime = timestamp;
+      this.currentTime = timestamp + (this.timeDiff.sysTime - this.timeDiff.browserTime);
     })
   }
 }

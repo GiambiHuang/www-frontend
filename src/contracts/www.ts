@@ -35,7 +35,7 @@ export type Www = {
           "type": "i16"
         },
         {
-          "name": "initCooldown",
+          "name": "startGameCooldown",
           "type": "i64"
         },
         {
@@ -52,6 +52,10 @@ export type Www = {
         },
         {
           "name": "roundSettlementDuration",
+          "type": "i64"
+        },
+        {
+          "name": "terminateTime",
           "type": "i64"
         }
       ]
@@ -80,7 +84,7 @@ export type Www = {
           "type": "i16"
         },
         {
-          "name": "initCooldown",
+          "name": "startGameCooldown",
           "type": "i64"
         },
         {
@@ -98,19 +102,12 @@ export type Www = {
         {
           "name": "roundSettlementDuration",
           "type": "i64"
+        },
+        {
+          "name": "terminateTime",
+          "type": "i64"
         }
       ]
-    },
-    {
-      "name": "createMatch",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "startGame",
@@ -286,6 +283,32 @@ export type Www = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "terminate",
+      "accounts": [
+        {
+          "name": "matchAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -353,10 +376,6 @@ export type Www = {
             "type": "i64"
           },
           {
-            "name": "matchAccount",
-            "type": "publicKey"
-          },
-          {
             "name": "rentExempt",
             "type": "u64"
           }
@@ -400,6 +419,10 @@ export type Www = {
           },
           {
             "name": "consecutiveJoins",
+            "type": "u32"
+          },
+          {
+            "name": "wins",
             "type": "u32"
           },
           {
@@ -447,7 +470,7 @@ export type Www = {
             "type": "i16"
           },
           {
-            "name": "initCooldown",
+            "name": "startGameCooldown",
             "type": "i64"
           },
           {
@@ -464,6 +487,10 @@ export type Www = {
           },
           {
             "name": "roundSettlementDuration",
+            "type": "i64"
+          },
+          {
+            "name": "terminateTime",
             "type": "i64"
           }
         ]
@@ -594,6 +621,9 @@ export type Www = {
             "name": "Paused"
           },
           {
+            "name": "Draw"
+          },
+          {
             "name": "Finished"
           }
         ]
@@ -677,7 +707,7 @@ export type Www = {
     },
     {
       "code": 6003,
-      "name": "Started"
+      "name": "AlreadyStarted"
     },
     {
       "code": 6004,
@@ -701,7 +731,7 @@ export type Www = {
     },
     {
       "code": 6009,
-      "name": "TooLate"
+      "name": "ExceededMaxDelay"
     }
   ]
 };
@@ -743,7 +773,7 @@ export const IDL: Www = {
           "type": "i16"
         },
         {
-          "name": "initCooldown",
+          "name": "startGameCooldown",
           "type": "i64"
         },
         {
@@ -760,6 +790,10 @@ export const IDL: Www = {
         },
         {
           "name": "roundSettlementDuration",
+          "type": "i64"
+        },
+        {
+          "name": "terminateTime",
           "type": "i64"
         }
       ]
@@ -788,7 +822,7 @@ export const IDL: Www = {
           "type": "i16"
         },
         {
-          "name": "initCooldown",
+          "name": "startGameCooldown",
           "type": "i64"
         },
         {
@@ -806,19 +840,12 @@ export const IDL: Www = {
         {
           "name": "roundSettlementDuration",
           "type": "i64"
+        },
+        {
+          "name": "terminateTime",
+          "type": "i64"
         }
       ]
-    },
-    {
-      "name": "createMatch",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "startGame",
@@ -994,6 +1021,32 @@ export const IDL: Www = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "terminate",
+      "accounts": [
+        {
+          "name": "matchAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "gameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1061,10 +1114,6 @@ export const IDL: Www = {
             "type": "i64"
           },
           {
-            "name": "matchAccount",
-            "type": "publicKey"
-          },
-          {
             "name": "rentExempt",
             "type": "u64"
           }
@@ -1108,6 +1157,10 @@ export const IDL: Www = {
           },
           {
             "name": "consecutiveJoins",
+            "type": "u32"
+          },
+          {
+            "name": "wins",
             "type": "u32"
           },
           {
@@ -1155,7 +1208,7 @@ export const IDL: Www = {
             "type": "i16"
           },
           {
-            "name": "initCooldown",
+            "name": "startGameCooldown",
             "type": "i64"
           },
           {
@@ -1172,6 +1225,10 @@ export const IDL: Www = {
           },
           {
             "name": "roundSettlementDuration",
+            "type": "i64"
+          },
+          {
+            "name": "terminateTime",
             "type": "i64"
           }
         ]
@@ -1302,6 +1359,9 @@ export const IDL: Www = {
             "name": "Paused"
           },
           {
+            "name": "Draw"
+          },
+          {
             "name": "Finished"
           }
         ]
@@ -1385,7 +1445,7 @@ export const IDL: Www = {
     },
     {
       "code": 6003,
-      "name": "Started"
+      "name": "AlreadyStarted"
     },
     {
       "code": 6004,
@@ -1409,7 +1469,7 @@ export const IDL: Www = {
     },
     {
       "code": 6009,
-      "name": "TooLate"
+      "name": "ExceededMaxDelay"
     }
   ]
 };
