@@ -118,7 +118,9 @@ export const getAttackEvents = async (until?: string) => {
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
     if (value?.name === 'AttackEvent' && (game?.startTime.toNumber() || 0) < (blockTime || 0)) {
-      const { attacker, target, targetLivesRemaining } = value?.data;
+      const { attacker, target, targetLivesRemaining, playersRemaining } = value?.data;
+      console.log('attacker:', attacker?.toString(), ', playersRemaining:', playersRemaining);
+      console.log('target:', target?.toString(), ', targetLivesRemaining:', targetLivesRemaining);
       if (!targetLivesRemaining) {
         playerUpdate[(target as web3.PublicKey).toString()] = (attacker as web3.PublicKey).toString()
       }
