@@ -36,6 +36,7 @@ export const getGame = async () => {
       gameMatchPublicKey,
     );
     const game = await anonymousProgram.account.game.fetch(gamePDA);
+    console.log(game);
     return {
       config: match.gameCfg,
       startTime: game.startTime,
@@ -80,7 +81,6 @@ export const getCurrentPlayers = async () => {
     const { blockTime, meta } = txn || {};
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
-    console.log(value);
     if (value?.name === 'JoinEvent' && (game?.startTime.toNumber() ?? 0) < (blockTime || 0)) {
       const publicKey = new web3.PublicKey(value?.data?.player as any);
       playerPublicKeys.push(publicKey);
@@ -118,7 +118,6 @@ export const getAttackEvents = async (until?: string) => {
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
     if (value?.name === 'AttackEvent' && (game?.startTime.toNumber() || 0) < (blockTime || 0)) {
-      console.log('-----', value);
       const { attacker, target, targetLivesRemaining } = value?.data;
       if (!targetLivesRemaining) {
         playerUpdate[(target as web3.PublicKey).toString()] = (attacker as web3.PublicKey).toString()
