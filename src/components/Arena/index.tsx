@@ -1,4 +1,4 @@
-import { Box, Center, chakra } from "@chakra-ui/react";
+import { Box, Center, Flex, chakra } from "@chakra-ui/react";
 import { FC } from "react";
 
 import Avatar1 from '@/assets/avatars/avatar-2.png';
@@ -21,7 +21,7 @@ const avatarMap = [
 
 const Arena: FC<IArena> = ({ players, me, onClick }) => {
   return (
-    <Box>
+    <Flex gap={'0.25rem'}>
       {players.filter(player => player !== me).map((player, idx) => (
         <Center
           key={player}
@@ -59,7 +59,7 @@ const Arena: FC<IArena> = ({ players, me, onClick }) => {
           />
         </Center>
       ))}
-    </Box>
+    </Flex>
   );
 }
 

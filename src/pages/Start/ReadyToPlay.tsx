@@ -36,12 +36,12 @@ const ReadyToPlay: FC = () => {
         <Text>You've chosen {playerStore.me.lives} wagers to participate in this game.</Text>
         <Text>Please wait patiently, the game will start soon!</Text>
       </Box>
-      <AppModal open={countdown <= 60} motionPreset="none">
+      <AppModal open={countdown <= 30} motionPreset="none">
         <Center flexDirection={'column'} fontFamily={'Potta One'} w={'100vw'} h={'100vh'} bgImage={backgroundImg} bgSize={'cover'} bgRepeat={'no-repeat'} bgPos={'top center'}>
           <Text fontSize={'2.5rem'} lineHeight={1} color={'button.bg'}>GAME STARTS IN</Text>
           <chakra.svg textShadow={'0 0.25rem 0.25rem rgba(0, 0, 0, 0.25)'} width="240px" fontSize={'10rem'} height="220px" viewBox="0 0 200 221" xmlns="http://www.w3.org/2000/svg">
             <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" strokeWidth="2rem" paintOrder="stroke" stroke="#2F6B75">
-              {countdown}
+              {countdown.toFixed(0)}
             </text>
           </chakra.svg>
         </Center>
