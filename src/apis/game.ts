@@ -119,6 +119,7 @@ export const getAttackEvents = async (until?: string) => {
     const { value } = events.next();
     if (value?.name === 'AttackEvent' && (game?.startTime.toNumber() || 0) < (blockTime || 0)) {
       const { attacker, target, targetLivesRemaining, playersRemaining } = value?.data;
+      console.log('  ------    ');
       console.log('attacker:', attacker?.toString(), ', playersRemaining:', playersRemaining);
       console.log('target:', target?.toString(), ', targetLivesRemaining:', targetLivesRemaining);
       if (!targetLivesRemaining) {
