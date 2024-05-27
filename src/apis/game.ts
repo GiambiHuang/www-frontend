@@ -5,7 +5,7 @@ import { Connection } from "@solana/web3.js";
 import { IDL } from "@/contracts/www";
 
 import * as buffer from "buffer";
-import { getGamePDA, getPlayerPDA } from "@/utils/www";
+import { getGamePDA, getPlayerPDA, getPlayerStatsAccount } from "@/utils/www";
 window.Buffer = buffer.Buffer;
 
 const connection = new Connection(endpoint, 'processed')
@@ -134,6 +134,7 @@ export type LeaderboardPlayer = {
   publicKey: string;
   points: number;
   streak: number;
+  wins: number;
 }
 
 export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
@@ -141,7 +142,6 @@ export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
     const connection = new Connection(endpoint, 'confirmed')
     const sign = await connection.getSignaturesForAddress(anonymousProgram.programId);
     const txns = await connection.getTransactions(sign.map(s => s.signature));
-    const match = await anonymousProgram.account.match.fetch(gameMatchPublicKey);
 
     const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
     const playerPDAs = [];
@@ -154,17 +154,19 @@ export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
         const publicKey = new web3.PublicKey(value?.data?.player as any).toString();
         if (!playerPublicKeys.includes(publicKey)) {
           playerPublicKeys.push(publicKey);
-          playerPDAs.push(getPlayerPDA(anonymousProgram.programId, match.number, new web3.PublicKey(publicKey))[0])
+          playerPDAs.push(getPlayerStatsAccount(anonymousProgram.programId, new web3.PublicKey(publicKey))[0])
         }
       }
     }
 
-    const players = await anonymousProgram.account.player.fetchMultiple(playerPDAs);
+    const players = await anonymousProgram.account.stats.fetchMultiple(playerPDAs);
+    console.log(players);
     return players
       .map((player, idx) => ({
         publicKey: playerPublicKeys[idx],
         points: player?.points.points ?? 0,
         streak: player?.consecutiveJoins ?? 0,
+        wins: player?.wins ?? 0,
       }))
       .sort((x, y) => y.points - x.points)
   } catch (error) {

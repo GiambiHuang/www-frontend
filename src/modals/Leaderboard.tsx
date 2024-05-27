@@ -74,14 +74,14 @@ const Leaderboard: FC = () => {
                   </Td>
                   <Td textAlign={getTextAlign('PLAYER')} fontSize={'2rem'} color={'#444444'}>{shortAddress(player.publicKey, 4, 4)}</Td>
                   <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>{player.streak}</Td>
-                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>--</Td>
+                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>{player.wins}</Td>
                   <Td textAlign={getTextAlign('POINTS')} fontSize={'2rem'} color={'#444444'}>{player.points}</Td>
                 </Tr>
               ))}
               <Tr>
                 <Td colSpan={5}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="957" height="4" viewBox="0 0 957 4" fill="none">
-                    <path d="M2 2H955" stroke="white" stroke-width="3" stroke-linecap="round" stroke-dasharray="16 16"/>
+                    <path d="M2 2H955" stroke="white" strokeWidth="3" strokeLinecap="round" strokeDasharray="16 16"/>
                   </svg>
                 </Td>
               </Tr>
@@ -93,8 +93,8 @@ const Leaderboard: FC = () => {
                     </Center>
                   </Td>
                   <Td textAlign={getTextAlign('PLAYER')} fontSize={'2rem'} color={'#444444'}>{shortAddress(player.publicKey, 4, 4)}</Td>
-                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>--</Td>
-                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>--</Td>
+                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>{player.streak}</Td>
+                  <Td textAlign={'center'} fontSize={'2rem'} color={'#444444'}>{player.wins}</Td>
                   <Td textAlign={getTextAlign('POINTS')} fontSize={'2rem'} color={'#444444'}>{player.points}</Td>
                 </Tr>
               ))}

@@ -159,39 +159,23 @@ export type Www = {
           "isSigner": false
         },
         {
+          "name": "playerStatsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "winner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "claimEarned",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "gameAccount",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "admin",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
-          "name": "receiverAccount",
-          "isMut": true,
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -217,6 +201,11 @@ export type Www = {
         },
         {
           "name": "playerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "playerStatsAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -416,7 +405,31 @@ export type Www = {
           {
             "name": "lastMatch",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "attack",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attacked",
+            "type": "publicKey"
           },
+          {
+            "name": "tmp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "stats",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "consecutiveJoins",
             "type": "u32"
@@ -430,26 +443,6 @@ export type Www = {
             "type": {
               "defined": "Points"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "attack",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attacker",
-            "type": "publicKey"
-          },
-          {
-            "name": "attacked",
-            "type": "publicKey"
-          },
-          {
-            "name": "tmp",
-            "type": "i64"
           }
         ]
       }
@@ -571,6 +564,9 @@ export type Www = {
           },
           {
             "name": "RoundSettlementPeriod"
+          },
+          {
+            "name": "TargetDead"
           }
         ]
       }
@@ -688,6 +684,11 @@ export type Www = {
           "name": "playersRemaining",
           "type": "u32",
           "index": false
+        },
+        {
+          "name": "round",
+          "type": "i64",
+          "index": false
         }
       ]
     }
@@ -732,6 +733,10 @@ export type Www = {
     {
       "code": 6009,
       "name": "ExceededMaxDelay"
+    },
+    {
+      "code": 6010,
+      "name": "FeeClaimed"
     }
   ]
 };
@@ -897,39 +902,23 @@ export const IDL: Www = {
           "isSigner": false
         },
         {
+          "name": "playerStatsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "winner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "claimEarned",
-      "accounts": [
-        {
-          "name": "matchAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "gameAccount",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "admin",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
-          "name": "receiverAccount",
-          "isMut": true,
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -955,6 +944,11 @@ export const IDL: Www = {
         },
         {
           "name": "playerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "playerStatsAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1154,7 +1148,31 @@ export const IDL: Www = {
           {
             "name": "lastMatch",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "attack",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attacked",
+            "type": "publicKey"
           },
+          {
+            "name": "tmp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "stats",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "consecutiveJoins",
             "type": "u32"
@@ -1168,26 +1186,6 @@ export const IDL: Www = {
             "type": {
               "defined": "Points"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "attack",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attacker",
-            "type": "publicKey"
-          },
-          {
-            "name": "attacked",
-            "type": "publicKey"
-          },
-          {
-            "name": "tmp",
-            "type": "i64"
           }
         ]
       }
@@ -1309,6 +1307,9 @@ export const IDL: Www = {
           },
           {
             "name": "RoundSettlementPeriod"
+          },
+          {
+            "name": "TargetDead"
           }
         ]
       }
@@ -1426,6 +1427,11 @@ export const IDL: Www = {
           "name": "playersRemaining",
           "type": "u32",
           "index": false
+        },
+        {
+          "name": "round",
+          "type": "i64",
+          "index": false
         }
       ]
     }
@@ -1470,6 +1476,10 @@ export const IDL: Www = {
     {
       "code": 6009,
       "name": "ExceededMaxDelay"
+    },
+    {
+      "code": 6010,
+      "name": "FeeClaimed"
     }
   ]
 };

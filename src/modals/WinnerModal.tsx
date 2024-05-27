@@ -20,11 +20,15 @@ const WinnerModal: FC<{ onFinish: () => void }> = ({ onFinish }) => {
     setTimeout(() => { setGo(true) }, 1000);
   }, []);
 
+  // useEffect(() => {
+  //   if (go) {
+  //     onFinish();
+  //   }
+  // }, [go]);
+
   useEffect(() => {
-    if (go) {
-      onFinish();
-    }
-  }, [go]);
+    onFinish();
+  }, []);
 
   return (
     <AppModal open motionPreset="none">

@@ -28,6 +28,7 @@ export class GameStore {
     makeAutoObservable(this, {
       started: computed,
       round: computed,
+      ready: computed,
       ableToJoin: computed,
     });
     this.rootStore = rootStore;
@@ -35,6 +36,11 @@ export class GameStore {
 
   get started () {
     return this.startTime > 0 && this.currentTime >= this.startTime;
+  }
+
+  get ready () {
+    const timeAfterStart = Math.floor((this.currentTime - this.startTime) / 1000);
+    return this.startTime > 0 && timeAfterStart >= -25;
   }
 
   get ableToJoin () {

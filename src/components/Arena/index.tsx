@@ -50,7 +50,7 @@ const Arena: FC<IArena> = ({ players, me, onClick }) => {
           </chakra.svg>
           <Box
             className="avatar"
-            bgImg={avatarMap[idx % players.length]}
+            bgImg={avatarMap[idx % 3]}
             w={'6.25rem'}
             h={'8.75rem'}
             bgSize={'cover'}

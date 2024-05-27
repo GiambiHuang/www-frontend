@@ -48,3 +48,13 @@ export const getPlayerPDA = (
     programID
   );
 };
+
+export const getPlayerStatsAccount = (
+  programID: anchor.web3.PublicKey,
+  player: anchor.web3.PublicKey
+) => {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("player_stats"), player.toBuffer()],
+    programID
+  );
+};

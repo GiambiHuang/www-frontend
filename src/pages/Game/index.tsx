@@ -11,7 +11,7 @@ import WinnerModal from '@/modals/WinnerModal';
 import NextRound from '@/modals/NextRound';
 import useProgram from '@/hooks/useProgram';
 import { gameMatchPublicKey } from '@/constants/network';
-import { getAttackPDA, getGamePDA, getPlayerPDA } from '@/utils/www';
+import { getAttackPDA, getGamePDA, getPlayerPDA, getPlayerStatsAccount } from '@/utils/www';
 import useResetGame from '@/hooks/useResetGame';
 import PendingScreen from '@/modals/PendingScreen';
 import { toast } from 'react-toastify';
@@ -64,6 +64,7 @@ const Game: FC = () => {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
         const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
+        const [playerStatsAccount] = getPlayerStatsAccount(program.programId, globalStore.publicKey);
         try {
           await program.methods
             .finish()
@@ -72,6 +73,8 @@ const Game: FC = () => {
               gameAccount,
               winnerAccount,
               winner: globalStore.publicKey,
+              admin: match.admin,
+              playerStatsAccount
             })
             .rpc();
             reset();

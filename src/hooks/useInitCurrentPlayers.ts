@@ -25,7 +25,7 @@ const useInitCurrentPlayers = () => {
       //   playersStore.setPlayers({});
       // }
     }
-  }, [gameStore.started, gameStore.init]);
+  }, [gameStore.started, gameStore.init, gameStore.ready]);
 
   const fetchDeadPlayers = useCallback(async () => {
     if (gameStore.round.break && playersStore.init) {

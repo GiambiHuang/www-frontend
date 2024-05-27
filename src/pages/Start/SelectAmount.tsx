@@ -6,7 +6,7 @@ import { WAGER_AMOUNTS } from "@/constants/game";
 import useRuleModal from "@/hooks/useRuleModal";
 import useProgram from "@/hooks/useProgram";
 import { BN } from "@coral-xyz/anchor";
-import { getAttackPDA, getGamePDA, getPlayerPDA } from "@/utils/www";
+import { getAttackPDA, getGamePDA, getPlayerPDA, getPlayerStatsAccount } from "@/utils/www";
 import { gameMatchPublicKey } from "@/constants/network";
 import { toast } from "react-toastify";
 import { observer } from "mobx-react-lite";
@@ -28,8 +28,8 @@ const SelectAmount: FC = () => {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [attackAccount] = getAttackPDA(program.programId, match.number, globalStore.publicKey);
         const [playerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
+        const [playerStatsAccount] = getPlayerStatsAccount(program.programId, globalStore.publicKey);
         const [game] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
-      
         await program.methods
           .join(gameStore.entranceFee.mul(new BN(amount)))
           .accounts({
@@ -38,6 +38,7 @@ const SelectAmount: FC = () => {
             attackAccount,
             playerAccount,
             player: globalStore.publicKey,
+            playerStatsAccount
           })
           .rpc();
         // console.log('tx::::', tx);
