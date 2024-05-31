@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from "react";
-import { useRecoilValue, useResetRecoilState } from "recoil";
 import { Box, Center, Flex, Image, Img, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 
 import Close from "@/assets/icons/close.svg?react";
