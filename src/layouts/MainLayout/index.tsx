@@ -7,18 +7,16 @@ import { Box, Center, Flex } from "@chakra-ui/react";
 import LeaderboardButton from "@/containers/LeaderboardButton";
 import GameCounter from "@/components/GameCounter";
 import ConnectWalletButton from "@/containers/ConnectWalletButton";
-import useLeaderboardModal from "@/hooks/useLeaderboardModal";
 import { observer } from "mobx-react-lite";
 import { store } from "@/stores/RootStore";
 
 const MainLayout: React.FC = () => {
-  const { gameStore } = store;
-  const { openModal } = useLeaderboardModal();
+  const { gameStore, globalStore } = store;
 
   return (
     <Center h={'100vh'} position={'relative'} w={'100vw'}>
       <Flex w={'100%'} position={'absolute'} top={0}>
-        <Center flex={1} pt={'1rem'} onClick={openModal}>
+        <Center flex={1} pt={'1rem'} onClick={() => globalStore.handleLeaderboardModal()}>
           <LeaderboardButton />
         </Center>
         <Box textAlign="center" padding="1rem 2rem 0.5rem" bg="rgba(0, 0, 0, 13%)" borderBottomRadius="1rem">

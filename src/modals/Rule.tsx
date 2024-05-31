@@ -1,10 +1,10 @@
 import AppModal from "@/components/AppModal";
-import { RuleState } from "@/stores/modal";
 import { FC } from "react";
-import { useRecoilValue, useResetRecoilState } from "recoil";
 import Close from "@/assets/icons/close.svg?react";
 
 import { Box, Flex, ListItem, Text, UnorderedList, VStack } from "@chakra-ui/react";
+import { store } from "@/stores/RootStore";
+import { observer } from "mobx-react-lite";
 
 const rules = [
   {
@@ -39,10 +39,9 @@ const rules = [
 ];
 
 const Rule: FC = () => {
-  const ruleState = useRecoilValue(RuleState);
-  const resetRule = useResetRecoilState(RuleState);
+  console.log(store.globalStore.ruleModal);
   return (
-    <AppModal open={ruleState.open}>
+    <AppModal open={store.globalStore.ruleModal}>
       <Flex
         justifyContent="center"
         position="relative"
@@ -75,7 +74,7 @@ const Rule: FC = () => {
         >
           RULES
         </Box>
-        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={resetRule}>
+        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={() => store.globalStore.handleRuleModal(false)}>
           <Close />
         </Box>
         <VStack
@@ -112,4 +111,4 @@ const Rule: FC = () => {
   );
 }
 
-export default Rule;
+export default observer(Rule);

@@ -5,21 +5,21 @@ import { Box, Center, Flex, Image, Img, Table, TableContainer, Tbody, Td, Th, Th
 import Close from "@/assets/icons/close.svg?react";
 import Crown from "@/assets/images/crown.webp";
 import AppModal from "@/components/AppModal";
-import { LeaderboardState } from "@/stores/modal";
 import { getLeaderboard, LeaderboardPlayer } from "@/apis/game";
 import { shortAddress } from "@/utils/shortAddress";
 import No1 from '@/assets/images/no1.png';
 import No2 from '@/assets/images/no2.png';
 import No3 from '@/assets/images/no3.png';
+import { store } from "@/stores/RootStore";
+import { observer } from "mobx-react-lite";
 
 const Leaderboard: FC = () => {
-  const leaderboardState = useRecoilValue(LeaderboardState);
-  const resetLeaderboard = useResetRecoilState(LeaderboardState);
+  const { globalStore } = store;
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
 
   useEffect(() => {
-    getLeaderboard().then(list => setPlayers(list));
-  }, [leaderboardState.open]);
+    globalStore.leaderboardModal && getLeaderboard().then(list => setPlayers(list));
+  }, [globalStore.leaderboardModal]);
 
   const getTextAlign = (field: string) => {
     if (field === 'POINTS') return 'right';
@@ -32,7 +32,7 @@ const Leaderboard: FC = () => {
     return idx === 1 ? No2 : No3;
   }
   return (
-    <AppModal open={leaderboardState.open}>
+    <AppModal open={globalStore.leaderboardModal}>
       <Flex justifyContent="center" position="relative" minH="24rem" fontFamily="Potta One" bg="button.border" p="2rem 2.125rem" borderRadius="1rem" border="0.5rem" borderStyle="solid" borderColor="button.bg">
         <Center
           fontSize="2.25rem"
@@ -52,7 +52,7 @@ const Leaderboard: FC = () => {
           LEADERBOARD
           <Image src={Crown} position={'absolute'} boxSize={'7.8125rem'} bottom={'calc(100% - 0.625rem)'}/>
         </Center>
-        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={resetLeaderboard}>
+        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={() => globalStore.handleLeaderboardModal(false)}>
           <Close />
         </Box>
         <TableContainer>
@@ -106,4 +106,4 @@ const Leaderboard: FC = () => {
   );
 }
 
-export default Leaderboard;
+export default observer(Leaderboard);

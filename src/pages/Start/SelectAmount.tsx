@@ -3,7 +3,6 @@ import { Flex, Box, Text, Button } from "@chakra-ui/react";
 
 import AmountBoard from "@/components/AmountBoard";
 import { WAGER_AMOUNTS } from "@/constants/game";
-import useRuleModal from "@/hooks/useRuleModal";
 import useProgram from "@/hooks/useProgram";
 import { BN } from "@coral-xyz/anchor";
 import { getAttackPDA, getGamePDA, getPlayerPDA, getPlayerStatsAccount } from "@/utils/www";
@@ -14,7 +13,6 @@ import { store } from "@/stores/RootStore";
 
 const SelectAmount: FC = () => {
   const { globalStore, gameStore, playerStore } = store;
-  const { openModal: openRuleModal } = useRuleModal();
   const [amount, setAmount] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,6 +28,20 @@ const SelectAmount: FC = () => {
         const [playerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
         const [playerStatsAccount] = getPlayerStatsAccount(program.programId, globalStore.publicKey);
         const [game] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
+        let statExist = true;
+        try {
+          await program.account.stats.fetch(playerStatsAccount.toString());
+        } catch (error) {
+          statExist = false;
+        }
+        if (!statExist) {
+          await program.methods.createPlayerStats().accounts({
+            playerStatsAccount,
+            player: globalStore.publicKey,
+          })
+          .rpc();
+        }
+        
         await program.methods
           .join(gameStore.entranceFee.mul(new BN(amount)))
           .accounts({
@@ -41,7 +53,6 @@ const SelectAmount: FC = () => {
             playerStatsAccount
           })
           .rpc();
-        // console.log('tx::::', tx);
         const [playerPDA] = getPlayerPDA(
           program.programId,
           match.number,
@@ -50,6 +61,7 @@ const SelectAmount: FC = () => {
         const player = await program.account.player.fetch(playerPDA);
         playerStore.setPlayer(player);
       } catch (error) {
+        console.log(error);
         toast.error((error as Error).message);
         setLoading(false);
       }
@@ -86,7 +98,7 @@ const SelectAmount: FC = () => {
         <Button variant="primary" width="100%" isDisabled={!amount} pointerEvents={loading ? 'none' : 'auto'} onClick={handleJoinGame}>
           {loading ? 'LOADING...' : 'SELECT'}
         </Button>
-        <Button variant="secondary" onClick={openRuleModal}>
+        <Button variant="secondary" onClick={() => globalStore.handleRuleModal()}>
           RULES
         </Button>
       </Flex>

@@ -1,14 +1,13 @@
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import { Flex, Box, Button, Center } from "@chakra-ui/react";
 
-import useRuleModal from "@/hooks/useRuleModal";
 import Logo from '@/assets/images/logo-main.svg?react';
 import { useNavigate } from "react-router-dom";
 import backgroundImg from '@/assets/images/background.webp';
-import useConnectModal from '@/hooks/useConnectModal';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
+import { useConnection } from '@solana/wallet-adapter-react';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -18,16 +17,15 @@ const AppContainer = styled.div`
 `;
 
 const App: FC = () => {
+  const { connection } = useConnection();
   const { globalStore, gameStore } = store;
-  const { openModal: openRuleModal } = useRuleModal();
-  const { openModal: openConnectModal } = useConnectModal();
   const navigate = useNavigate();
 
   const handlePlay = useCallback(() => {
     if (globalStore.connected) {
       navigate('/start');
     } else {
-      openConnectModal();
+      globalStore.handleConnectModal();
     }
   }, [globalStore.connected]);
 
@@ -35,6 +33,12 @@ const App: FC = () => {
     gameStore.ableToJoin && gameStore.init,
     [gameStore.ableToJoin, gameStore.init]
   );
+
+  useEffect(() => {
+    if (globalStore.publicKey) {
+      connection.getBalance(globalStore.publicKey).then(console.log)
+    }
+  }, [globalStore.publicKey]);
 
   return (
     <AppContainer>
@@ -47,7 +51,7 @@ const App: FC = () => {
             <Button variant="primary" width="100%" isDisabled={!canJoin} onClick={handlePlay}>
               PLAY
             </Button>
-            <Button variant="secondary" onClick={openRuleModal}>
+            <Button variant="secondary" onClick={() => globalStore.handleRuleModal()}>
               RULES
             </Button>
           </Flex>

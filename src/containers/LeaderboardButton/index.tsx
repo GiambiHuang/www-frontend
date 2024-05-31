@@ -2,10 +2,10 @@ import { Box, Image } from "@chakra-ui/react";
 import { FC } from "react";
 
 import Leaderboard from '@/assets/images/leaderboard.webp';
-import useLeaderboardModal from "@/hooks/useLeaderboardModal";
+import { observer } from "mobx-react-lite";
+import { store } from "@/stores/RootStore";
 
 const LeaderboardButton: FC = () => {
-  const { openModal } = useLeaderboardModal();
   return (
     <Box
       boxSize={{ base: '8rem', lg: '11.25rem' }}
@@ -15,11 +15,11 @@ const LeaderboardButton: FC = () => {
       _hover={{
         opacity: 1
       }}
-      onClick={openModal}
+      onClick={() => store.globalStore.handleLeaderboardModal()}
     >
       <Image src={Leaderboard} />
     </Box>
   );
 }
 
-export default LeaderboardButton;
+export default observer(LeaderboardButton);

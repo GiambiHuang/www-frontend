@@ -1,14 +1,14 @@
 import AppModal from "@/components/AppModal";
-import { ConnectWalletState } from "@/stores/modal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { FC } from "react";
-import { useRecoilValue, useResetRecoilState } from "recoil";
 import { styled } from "styled-components";
 import MetaMask from "@/assets/icons/metamask.svg?react";
 import Salmon from "@/assets/icons/salmon.svg?react";
 import Close from "@/assets/icons/close.svg?react";
 
 import { Box, Flex, chakra } from "@chakra-ui/react";
+import { store } from "@/stores/RootStore";
+import { observer } from "mobx-react-lite";
 
 const ConnectWalletOptions = styled.div`
   display: flex;
@@ -40,11 +40,10 @@ const Option = chakra(Flex, {
 })
 
 const ConnectWallet: FC = () => {
-  const connectWalletState = useRecoilValue(ConnectWalletState);
-  const resetConnectWallet = useResetRecoilState(ConnectWalletState);
+  const { globalStore } = store;
   const { wallets, select } = useWallet();
   return (
-    <AppModal open={connectWalletState.open}>
+    <AppModal open={globalStore.connectModal}>
       <Flex justifyContent="center" position="relative" minH="24rem" fontFamily="Potta One" bg="button.border" px="2.125rem" borderRadius="1rem" border="0.5rem" borderStyle="solid" borderColor="button.bg">
         <Box
           fontSize="2.25rem"
@@ -63,7 +62,7 @@ const ConnectWallet: FC = () => {
         >
           CONNECT WALLET
         </Box>
-        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={resetConnectWallet}>
+        <Box position={'absolute'} top="0.75rem" right="0.5rem" cursor={'pointer'} onClick={() => globalStore.handleConnectModal(false)}>
           <Close />
         </Box>
         <ConnectWalletOptions>
@@ -93,4 +92,4 @@ const ConnectWallet: FC = () => {
   );
 }
 
-export default ConnectWallet;
+export default observer(ConnectWallet);

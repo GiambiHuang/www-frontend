@@ -12,7 +12,6 @@ import NextRound from '@/modals/NextRound';
 import useProgram from '@/hooks/useProgram';
 import { gameMatchPublicKey } from '@/constants/network';
 import { getAttackPDA, getGamePDA, getPlayerPDA, getPlayerStatsAccount } from '@/utils/www';
-import useResetGame from '@/hooks/useResetGame';
 import PendingScreen from '@/modals/PendingScreen';
 import { toast } from 'react-toastify';
 import { observer } from 'mobx-react-lite';
@@ -22,7 +21,6 @@ const Game: FC = () => {
   const { globalStore, gameStore, playerStore, playersStore } = store;
   const navigate = useNavigate();
   const program = useProgram();
-  const reset = useResetGame();
   const [pending, setPending] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>('');
 
@@ -52,6 +50,7 @@ const Game: FC = () => {
         
         setSelected(targetPublicKey.toString());
       } catch (error) {
+        console.log(error);
         toast.error((error as Error).message);
         setPending(false);
       }
@@ -77,7 +76,7 @@ const Game: FC = () => {
               playerStatsAccount
             })
             .rpc();
-            reset();
+            store.reset();
             navigate('/');
         } catch (error) {
           console.log(error);

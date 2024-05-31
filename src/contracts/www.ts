@@ -298,6 +298,27 @@ export type Www = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createPlayerStats",
+      "accounts": [
+        {
+          "name": "playerStatsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -431,8 +452,10 @@ export type Www = {
         "kind": "struct",
         "fields": [
           {
-            "name": "consecutiveJoins",
-            "type": "u32"
+            "name": "streaks",
+            "type": {
+              "defined": "Streak"
+            }
           },
           {
             "name": "wins",
@@ -528,6 +551,22 @@ export type Www = {
         "fields": [
           {
             "name": "points",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Streak",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lastJoined",
+            "type": "i64"
+          },
+          {
+            "name": "count",
             "type": "u32"
           }
         ]
@@ -1041,6 +1080,27 @@ export const IDL: Www = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createPlayerStats",
+      "accounts": [
+        {
+          "name": "playerStatsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1174,8 +1234,10 @@ export const IDL: Www = {
         "kind": "struct",
         "fields": [
           {
-            "name": "consecutiveJoins",
-            "type": "u32"
+            "name": "streaks",
+            "type": {
+              "defined": "Streak"
+            }
           },
           {
             "name": "wins",
@@ -1271,6 +1333,22 @@ export const IDL: Www = {
         "fields": [
           {
             "name": "points",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Streak",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lastJoined",
+            "type": "i64"
+          },
+          {
+            "name": "count",
             "type": "u32"
           }
         ]

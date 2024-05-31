@@ -1,4 +1,3 @@
-import useConnectModal from "@/hooks/useConnectModal";
 import { store } from "@/stores/RootStore";
 import { shortAddress } from "@/utils/shortAddress";
 import { Button, Center } from "@chakra-ui/react";
@@ -9,12 +8,11 @@ import { FC, useCallback, useMemo } from "react";
 const ConnectWalletButton: FC = () => {
   const { globalStore } = store;
   const { connecting } = useWallet();
-  const { openModal } = useConnectModal();
   const publicKey = useMemo(() => globalStore.publicKey && shortAddress(globalStore.publicKey.toString(), 4, 4), [globalStore.publicKey]);
 
   const handleClick = useCallback(() => {
     if (!connecting) {
-      openModal();
+      globalStore.handleConnectModal();
     }
   }, [publicKey, connecting]);
   return (
