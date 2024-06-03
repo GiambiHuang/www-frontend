@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect, useMemo, useState } from 'react'
+import { FC, Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { web3 } from '@coral-xyz/anchor';
 import { useNavigate } from 'react-router-dom';
 import { Center, chakra, Flex, Grid, GridItem } from '@chakra-ui/react';
@@ -18,6 +18,7 @@ import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
 
 const Game: FC = () => {
+  const ref = useRef<boolean>(false);
   const { globalStore, gameStore, playerStore, playersStore } = store;
   const navigate = useNavigate();
   const program = useProgram();
@@ -58,8 +59,9 @@ const Game: FC = () => {
   }
 
   const handleFinishGame = async () => {
-    if (globalStore.publicKey) {
+    if (globalStore.publicKey && !ref.current) {
       if (playersStore.isWinner) {
+        ref.current = true;
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
         const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
