@@ -160,6 +160,7 @@ export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
     }
 
     const players = await anonymousProgram.account.stats.fetchMultiple(playerPDAs);
+    console.log(players);
     return players
       .map((player, idx) => ({
         publicKey: playerPublicKeys[idx],
