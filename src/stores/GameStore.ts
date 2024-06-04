@@ -1,7 +1,7 @@
 import { computed, makeAutoObservable, runInAction } from "mobx";
 import { RootStore } from "./RootStore";
 import { BN } from "@coral-xyz/anchor";
-import { GetGameResult } from "@/apis/game";
+import { GetGameResult, getGame } from "@/apis/game";
 
 export class GameStore {
   init: boolean = false;
@@ -17,6 +17,9 @@ export class GameStore {
   roundSettlement: number = 0;
 
   firstShooter: string = '';
+  state: any = null;
+
+  gameStartSignature: string = '';
 
   timeDiff = {
     browserTime: 0,
@@ -71,6 +74,12 @@ export class GameStore {
     })
   }
 
+  setSignature (signature: string) {
+    runInAction(() => {
+      this.gameStartSignature = signature;
+    })
+  }
+
   setTimeDiff (browserTime: number, sysTime: number) {
     runInAction(() => {
       this.timeDiff = {
@@ -93,6 +102,10 @@ export class GameStore {
         this.roundSettlement = game.config.roundSettlementDuration.toNumber();
   
         this.entranceFee = game.config.entranceFee;
+        this.firstShooter = game.firstShooter;
+        this.state = game.state;
+      } else {
+        this.finished = true;
       }
 
       // this.currentConfig = {
@@ -107,5 +120,12 @@ export class GameStore {
     runInAction(() => {
       this.currentTime = timestamp + (this.timeDiff.sysTime - this.timeDiff.browserTime);
     })
+  }
+
+  async refresh () {
+    const game = await getGame();
+    if (this.state && JSON.stringify(game?.state) !== JSON.stringify(this.state)) {
+      this.init = false;
+    }
   }
 }

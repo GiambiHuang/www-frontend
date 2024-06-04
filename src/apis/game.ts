@@ -64,7 +64,7 @@ export const getCurrentPlayers = async () => {
   // const block = await connection.getBlock(slot, {
   //   maxSupportedTransactionVersion: 0,
   // });
-  const signs = await connection.getSignaturesForAddress(anonymousProgram.programId, { until: '3bgaGduMVZrpx7wFBzhxY39CNpiv4t7BXqSw3zF5dGL6fDQhesnASKrQZZt9uKeoesN5tngeqxDWtXWPcNQQBows' });
+  const signs = await connection.getSignaturesForAddress(anonymousProgram.programId);
   const signatures = signs.map(s => s.signature);
   const txns = await connection.getTransactions(
     signatures,
@@ -77,6 +77,7 @@ export const getCurrentPlayers = async () => {
 
   const playerPDAs = [];
   const playerPublicKeys = [];
+  let lastGameEndSignature = '';
   for (const txn of txns) {
     const { blockTime, meta } = txn || {};
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
@@ -86,14 +87,21 @@ export const getCurrentPlayers = async () => {
       playerPublicKeys.push(publicKey);
       playerPDAs.push(getPlayerPDA(anonymousProgram.programId, match.number, publicKey)[0])
     }
+    if (value?.name === 'EndEvent') {
+      lastGameEndSignature = txn?.transaction.signatures[0] ?? '';
+      break;
+    }
   }
 
   const players = await anonymousProgram.account.player.fetchMultiple(playerPDAs);
-  return playerPublicKeys.map((publicKey, idx) => ({
-    publicKey,
-    lives: players[idx]?.lives,
-    attacked: '',
-  }))
+  return {
+    players: playerPublicKeys.map((publicKey, idx) => ({
+      publicKey,
+      lives: players[idx]?.lives,
+      attacked: '',
+    })),
+    lastGameEndSignature,
+  }
 }
 
 export const getAttackEvents = async (until?: string) => {

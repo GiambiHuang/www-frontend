@@ -20,19 +20,27 @@ const MainLayout: React.FC = () => {
           <LeaderboardButton />
         </Center>
         <Box textAlign="center" padding="1rem 2rem 0.5rem" bg="rgba(0, 0, 0, 13%)" borderBottomRadius="1rem">
-          {gameStore.started ? (
-            <GameCounter
-              isOver={!gameStore.ableToJoin}
-              now={gameStore.startTime}
-              startFrom={gameStore.currentTime}
-              starting
-            />
-            ) : (
-            <GameCounter
-              isOver={!gameStore.ableToJoin}
-              now={gameStore.currentTime}
-              startFrom={gameStore.startTime}
-            />
+          {gameStore.finished ? (
+              <GameCounter
+                isOver
+                now={gameStore.currentTime}
+                startFrom={gameStore.startTime}
+              />
+          ) : (
+            gameStore.started ? (
+              <GameCounter
+                isOver={!gameStore.ableToJoin}
+                now={gameStore.startTime}
+                startFrom={gameStore.currentTime}
+                starting
+              />
+              ) : (
+              <GameCounter
+                isOver={!gameStore.ableToJoin}
+                now={gameStore.currentTime}
+                startFrom={gameStore.startTime}
+              />
+            )
           )}
         </Box>
         <Flex flex={1} justifyContent={'flex-end'} alignItems={'flex-end'}>

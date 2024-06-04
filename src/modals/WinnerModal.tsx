@@ -1,5 +1,5 @@
 import AppModal from "@/components/AppModal";
-import { Box, Center, Grid, GridItem, chakra, shouldForwardProp } from "@chakra-ui/react";
+import { Box, Button, Center, Grid, GridItem, chakra, shouldForwardProp } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 
 import backgroundImg from '@/assets/images/background-result.webp'
@@ -15,16 +15,20 @@ const ChakraBox = chakra(motion.div, {
 
 const WinnerModal: FC<{ onFinish: () => void }> = ({ onFinish }) => {
   const [go, setGo] = useState(false);
+  const [claiming, setClaiming] = useState(false);
+
+  const handleClaim = async () => {
+    setClaiming(true);
+    try {
+      await onFinish();
+    } catch (error) {
+      setClaiming(false);
+    }
+  }
 
   useEffect(() => {
     setTimeout(() => { setGo(true) }, 1000);
   }, []);
-
-  useEffect(() => {
-    if (go) {
-      onFinish();
-    }
-  }, [go]);
 
   return (
     <AppModal open motionPreset="none">
@@ -91,6 +95,11 @@ const WinnerModal: FC<{ onFinish: () => void }> = ({ onFinish }) => {
                   100
                 </GridItem>
               </Grid>
+              <Center py={'2rem'}>
+                <Button variant="primary" width="20rem" isDisabled={claiming} onClick={handleClaim}>
+                  Claim Reward
+                </Button>
+              </Center>
             </ChakraBox>
           )}
         </Center>

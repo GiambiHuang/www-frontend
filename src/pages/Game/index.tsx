@@ -26,7 +26,7 @@ const Game: FC = () => {
   const [selected, setSelected] = useState<string>('');
 
   const handleAttackPlayer = async (publicKey: string) => {
-    if (globalStore.publicKey) {
+    if (globalStore.publicKey && !playersStore.dead[globalStore.publicKey.toString()]) {
       setSelected('');
       setPending(true);
       const match = await program.account.match.fetch(gameMatchPublicKey);
@@ -66,23 +66,19 @@ const Game: FC = () => {
         const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
         const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
         const [playerStatsAccount] = getPlayerStatsAccount(program.programId, globalStore.publicKey);
-        try {
-          await program.methods
-            .finish()
-            .accounts({
-              matchAccount: gameMatchPublicKey,
-              gameAccount,
-              winnerAccount,
-              winner: globalStore.publicKey,
-              admin: match.admin,
-              playerStatsAccount
-            })
-            .rpc();
-            store.reset();
-            navigate('/');
-        } catch (error) {
-          console.log(error);
-        }
+        await program.methods
+          .finish()
+          .accounts({
+            matchAccount: gameMatchPublicKey,
+            gameAccount,
+            winnerAccount,
+            winner: globalStore.publicKey,
+            admin: match.admin,
+            playerStatsAccount
+          })
+          .rpc();
+          store.reset();
+          navigate('/');
       } else {
         setTimeout(() => {
           navigate('/');
@@ -126,9 +122,9 @@ const Game: FC = () => {
               <Arena players={livePlayers} onClick={handleAttackPlayer} me={publickKey} />
             </GridItem>
           </Grid>
-          {playersStore.dead[publickKey] && <LoserModal attacker={playersStore.dead[publickKey]} onFinish={handleFinishGame} />}
-          {playersStore.isWinner  && <WinnerModal onFinish={handleFinishGame} />}
+          {!playersStore.isWinner && playersStore.dead[publickKey] && <LoserModal attacker={playersStore.dead[publickKey]} onFinish={handleFinishGame} />}
           {!playersStore.isWinner && !playersStore.dead[publickKey] && gameStore.round.break && <NextRound />}
+          {playersStore.isWinner  && <WinnerModal onFinish={handleFinishGame} />}
           {pending && <PendingScreen target={selected} />}
         </Fragment>
       );

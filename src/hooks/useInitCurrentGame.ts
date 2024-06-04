@@ -9,15 +9,7 @@ const useInitCurrentGame = () => {
   const isVisible = usePageVisibility();
 
   const fetchCurrentGame = useCallback(async () => {
-    const [
-      game,
-      currentTime,
-    ] = await Promise.all([
-      getGame(),
-      getTimestamp(),
-    ]);
-    console.log(currentTime - Date.now());
-    gameStore.setTimeDiff(Date.now(), currentTime);
+    const game = await getGame();
     gameStore.setGame(game as GetGameResult);
     if (game) {
       const { state } = game;
@@ -31,13 +23,25 @@ const useInitCurrentGame = () => {
     }
   }, []);
 
+  const fetchCurrentTime = useCallback(async () => {
+    const currentTime = await getTimestamp();
+    gameStore.setTimeDiff(Date.now(), currentTime);
+  }, [])
+
   useEffect(() => {
     return () => { ref.current && clearInterval(ref.current); }
   }, []);
 
   useEffect(() => {
-    isVisible && fetchCurrentGame()
+    // isVisible && fetchCurrentGame();
+    isVisible && fetchCurrentTime();
   }, [isVisible]);
+
+  useEffect(() => {
+    if (!gameStore.init) {
+      fetchCurrentGame();
+    }
+  }, [gameStore.init]);
 }
 
 export default useInitCurrentGame;

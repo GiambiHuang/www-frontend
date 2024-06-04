@@ -9,7 +9,8 @@ const useInitCurrentPlayers = () => {
     if (gameStore.init) {
       // if (gameStore.started) {
         try {
-          const currentPlayers = await getCurrentPlayers();
+          const { players: currentPlayers, lastGameEndSignature } = await getCurrentPlayers();
+          gameStore.setSignature(lastGameEndSignature);
           const players = {} as Record<string, Player>;
           for (const player of currentPlayers) {
             players[player.publicKey.toString()] = {
@@ -28,15 +29,15 @@ const useInitCurrentPlayers = () => {
   }, [gameStore.started, gameStore.init, gameStore.ready]);
 
   const fetchDeadPlayers = useCallback(async () => {
-    if (gameStore.round.break && playersStore.init) {
+    if (gameStore.round.break && playersStore.init && gameStore.gameStartSignature) {
       const [playerUpdate, game] = await Promise.all([
-        getAttackEvents(),
+        getAttackEvents(gameStore.gameStartSignature),
         getGame(),
       ])
       gameStore.setFirstShooter(game?.firstShooter ?? '');
       playersStore.setDeadPlayers(playerUpdate);
     }
-  }, [gameStore.round.break, playersStore.init])
+  }, [gameStore.round.break, playersStore.init, gameStore.gameStartSignature])
 
   useEffect(() => {
     fetchCurrentPlayers();

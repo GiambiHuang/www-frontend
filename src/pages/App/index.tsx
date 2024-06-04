@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { Flex, Box, Button, Center } from "@chakra-ui/react";
 
@@ -7,7 +7,10 @@ import { useNavigate } from "react-router-dom";
 import backgroundImg from '@/assets/images/background.webp';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
-import { useConnection } from '@solana/wallet-adapter-react';
+import useProgram from '@/hooks/useProgram';
+import { gameMatchPublicKey } from '@/constants/network';
+import { getGamePDA } from '@/utils/www';
+import { BN } from '@coral-xyz/anchor';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -17,9 +20,10 @@ const AppContainer = styled.div`
 `;
 
 const App: FC = () => {
-  const { connection } = useConnection();
   const { globalStore, gameStore } = store;
   const navigate = useNavigate();
+  const program = useProgram();
+  const ref = useRef<NodeJS.Timeout>();
 
   const handlePlay = useCallback(() => {
     if (globalStore.connected) {
@@ -29,16 +33,43 @@ const App: FC = () => {
     }
   }, [globalStore.connected]);
 
+  const handleStart = useCallback(async () => {
+    ref.current && clearInterval(ref.current);
+    const match = await program.account.match.fetch(gameMatchPublicKey);
+    const [gameAccount] = getGamePDA(program.programId, match.number + 1, gameMatchPublicKey);
+    try {
+      await program.methods
+        .startGame(new BN(0))
+        .accounts({
+          gameAccount,
+          matchAccount: gameMatchPublicKey,
+          player: globalStore.publicKey || undefined,
+        })
+        .rpc();
+    } catch (error) {
+      console.log("error:", error);
+    } finally {
+      gameStore.refresh();
+    }
+  }, [program]);
+
   const canJoin = useMemo(() =>
     gameStore.ableToJoin && gameStore.init,
     [gameStore.ableToJoin, gameStore.init]
   );
 
+  const canStart = useMemo(() => {
+    return gameStore.init && gameStore.finished && globalStore.connected;
+  }, [gameStore.init, gameStore.finished, globalStore.connected]);
+
   useEffect(() => {
-    if (globalStore.publicKey) {
-      connection.getBalance(globalStore.publicKey).then(console.log)
+    ref.current = setInterval(() => {
+      gameStore.refresh();
+    }, 2000);
+    return () => {
+      ref.current && clearInterval(ref.current);
     }
-  }, [globalStore.publicKey]);
+  }, []);
 
   return (
     <AppContainer>
@@ -48,8 +79,11 @@ const App: FC = () => {
             <Logo />
           </Box>
           <Flex flexDirection="column" maxW="22.5rem" w={'100%'} gap="1.125rem" mt={'-1rem'}>
+            <Button variant="primary" width="100%" isDisabled={!canStart} onClick={handleStart}>
+              START GAME
+            </Button>
             <Button variant="primary" width="100%" isDisabled={!canJoin} onClick={handlePlay}>
-              PLAY
+              JOIN GAME
             </Button>
             <Button variant="secondary" onClick={() => globalStore.handleRuleModal()}>
               RULES
