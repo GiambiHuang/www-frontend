@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, Fragment, useEffect, useMemo, useState } from 'react'
 import { web3 } from '@coral-xyz/anchor';
 import { useNavigate } from 'react-router-dom';
 import { Center, chakra, Flex, Grid, GridItem } from '@chakra-ui/react';
@@ -11,14 +11,13 @@ import WinnerModal from '@/modals/WinnerModal';
 import NextRound from '@/modals/NextRound';
 import useProgram from '@/hooks/useProgram';
 import { gameMatchPublicKey } from '@/constants/network';
-import { getAttackPDA, getGamePDA, getPlayerPDA, getPlayerStatsAccount } from '@/utils/www';
+import { getAttackPDA, getGamePDA, getPlayerPDA } from '@/utils/www';
 import PendingScreen from '@/modals/PendingScreen';
 import { toast } from 'react-toastify';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
 
 const Game: FC = () => {
-  const ref = useRef<boolean>(false);
   const { globalStore, gameStore, playerStore, playersStore } = store;
   const navigate = useNavigate();
   const program = useProgram();
@@ -59,27 +58,8 @@ const Game: FC = () => {
   }
 
   const handleFinishGame = async () => {
-    if (globalStore.publicKey && !ref.current) {
-      if (playersStore.isWinner) {
-        ref.current = true;
-        const match = await program.account.match.fetch(gameMatchPublicKey);
-        const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
-        const [winnerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);
-        const [playerStatsAccount] = getPlayerStatsAccount(program.programId, globalStore.publicKey);
-        await program.methods
-          .finish()
-          .accounts({
-            matchAccount: gameMatchPublicKey,
-            gameAccount,
-            winnerAccount,
-            winner: globalStore.publicKey,
-            admin: match.admin,
-            playerStatsAccount
-          })
-          .rpc();
-          store.reset();
-          navigate('/');
-      } else {
+    if (globalStore.publicKey) {
+      if (!playersStore.isWinner) {
         setTimeout(() => {
           navigate('/');
         }, 5000);
@@ -124,7 +104,7 @@ const Game: FC = () => {
           </Grid>
           {!playersStore.isWinner && playersStore.dead[publickKey] && <LoserModal attacker={playersStore.dead[publickKey]} onFinish={handleFinishGame} />}
           {!playersStore.isWinner && !playersStore.dead[publickKey] && gameStore.round.break && <NextRound />}
-          {playersStore.isWinner  && <WinnerModal onFinish={handleFinishGame} />}
+          {playersStore.isWinner  && <WinnerModal />}
           {pending && <PendingScreen target={selected} />}
         </Fragment>
       );

@@ -4,6 +4,13 @@ import { FC, useEffect, useState } from "react";
 
 import backgroundImg from '@/assets/images/background-result.webp'
 import { isValidMotionProp, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import useProgram from "@/hooks/useProgram";
+import { gameMatchPublicKey } from "@/constants/network";
+import { getGamePDA, getPlayerPDA, getPlayerStatsAccount } from "@/utils/www";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { store } from "@/stores/RootStore";
+import { useNavigate } from "react-router-dom";
 
 const ChakraBox = chakra(motion.div, {
   /**
@@ -13,15 +20,36 @@ const ChakraBox = chakra(motion.div, {
     isValidMotionProp(prop) || shouldForwardProp(prop),
 });
 
-const WinnerModal: FC<{ onFinish: () => void }> = ({ onFinish }) => {
+const WinnerModal: FC = () => {
   const [go, setGo] = useState(false);
+  const program = useProgram();
+  const { publicKey } = useWallet();
+  const navigate = useNavigate();
   const [claiming, setClaiming] = useState(false);
 
   const handleClaim = async () => {
+    if (!publicKey) return;
     setClaiming(true);
     try {
-      await onFinish();
+      const match = await program.account.match.fetch(gameMatchPublicKey);
+      const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
+      const [winnerAccount] = getPlayerPDA(program.programId, match.number, publicKey);
+      const [playerStatsAccount] = getPlayerStatsAccount(program.programId, publicKey);
+      await program.methods
+        .finish()
+        .accounts({
+          matchAccount: gameMatchPublicKey,
+          gameAccount,
+          winnerAccount,
+          winner: publicKey,
+          admin: match.admin,
+          playerStatsAccount
+        })
+        .rpc();
+        store.reset();
+        navigate('/');
     } catch (error) {
+      toast.error((error as Error).message);
       setClaiming(false);
     }
   }
