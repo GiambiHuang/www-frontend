@@ -6,7 +6,7 @@ import { IDL } from "@/contracts/www";
 
 import * as buffer from "buffer";
 import { getGamePDA, getPlayerPDA, getPlayerStatsAccount } from "@/utils/www";
-import dayjs from "dayjs";
+
 window.Buffer = buffer.Buffer;
 
 const connection = new Connection(endpoint, 'processed')
@@ -168,12 +168,11 @@ export const getLeaderboard = async (): Promise<LeaderboardPlayer[]> => {
     }
 
     const players = await anonymousProgram.account.stats.fetchMultiple(playerPDAs);
-    console.log(players);
     return players
       .map((player, idx) => ({
         publicKey: playerPublicKeys[idx],
         points: player?.points.points ?? 0,
-        streak: (dayjs().unix() - (player?.streaks?.lastJoined?.toNumber() ?? 0)) >= 86400 ? 0 : player?.streaks.count ?? 0,
+        streak: player?.streaks.count ?? 0,
         wins: player?.wins ?? 0,
       }))
       .sort((x, y) => y.points - x.points)
