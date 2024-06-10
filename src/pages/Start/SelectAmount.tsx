@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-import { Flex, Box, Text, Button } from "@chakra-ui/react";
+import { FC, useMemo, useState } from "react";
+import { Flex, Box, Text, Button, Input, Center } from "@chakra-ui/react";
 
 import AmountBoard from "@/components/AmountBoard";
 import { WAGER_AMOUNTS } from "@/constants/game";
@@ -12,15 +12,20 @@ import { observer } from "mobx-react-lite";
 import { store } from "@/stores/RootStore";
 
 const SelectAmount: FC = () => {
-  const { globalStore, gameStore, playerStore } = store;
+  const { globalStore, gameStore } = store;
+  const [name, setName] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const program = useProgram();
 
+  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value.split('').filter(letter => letter.match(/[a-zA-Z0-9\_]/)).join(''))
+  }
+
   const handleJoinGame = async () => {
-    if (globalStore.publicKey) {
+    if (globalStore.publicKey && isEnableName) {
       setLoading(true);
       try {
         const match = await program.account.match.fetch(gameMatchPublicKey);
@@ -41,9 +46,9 @@ const SelectAmount: FC = () => {
           })
           .rpc();
         }
-        
+        const entraceFeeTotal = gameStore.gameConfig.entranceFee.mul(new BN(amount))
         await program.methods
-          .join(gameStore.entranceFee.mul(new BN(amount)))
+          .join(entraceFeeTotal, name)
           .accounts({
             matchAccount: gameMatchPublicKey,
             game,
@@ -59,7 +64,9 @@ const SelectAmount: FC = () => {
           globalStore.publicKey,
         );
         const player = await program.account.player.fetch(playerPDA);
-        playerStore.setPlayer(player);
+        console.log('player:', player);
+        gameStore.setMePlayer(true, player.lives, player.attacked.attacker.toString(), player.name);
+        // playerStore.setPlayer(player);
       } catch (error) {
         console.log(error);
         toast.error((error as Error).message);
@@ -67,6 +74,10 @@ const SelectAmount: FC = () => {
       }
     }
   }
+
+  const isEnableName = useMemo(() => {
+    return new Blob([name]).size <= 20;
+  }, [name]);
 
   return (
     <Flex flex={1} mt={'2rem'} flexDirection={'column'} alignItems={'center'}>
@@ -88,14 +99,36 @@ const SelectAmount: FC = () => {
             boxSize={'17.5rem'}
             unit={wager.unit}
             amount={wager.amount}
-            feeBase={gameStore.entranceFee}
+            feeBase={gameStore.gameConfig.entranceFee}
             selected={wager.amount === amount}
             onSelected={() => setAmount(wager.amount)}
           />
         ))}
       </Flex>
+      <Box textAlign={'center'} py={'0.5rem'}>
+        <Input
+          fontSize="1.5rem"
+          lineHeight="2.2rem"
+          variant="unstyled"
+          color="#fff"
+          py="1rem"
+          px="1.25rem"
+          bg="button.bg"
+          border="0.5rem"
+          borderColor={isEnableName ? 'button.border' : '#CD2927'}
+          borderStyle="solid"
+          borderRadius="3.75rem"
+          textAlign={'center'}
+          h="auto"
+          placeholder="Enter Your Name!"
+          w={{ base: '15rem', lg: '18.75rem' }}
+          value={name}
+          onChange={(event) => handleName(event)}
+        />
+        {!isEnableName && <Center color={'#fff'} mt={'0.5rem'} bgColor={'#CD2927'} fontSize={'1.25rem'}>Your name is too long</Center>}
+      </Box>
       <Flex flexDirection="column" maxW="22.5rem" w={'100%'} gap="1.125rem" py={'1rem'} >
-        <Button variant="primary" width="100%" isDisabled={!amount} pointerEvents={loading ? 'none' : 'auto'} onClick={handleJoinGame}>
+        <Button variant="primary" width="100%" isDisabled={!amount || !isEnableName} pointerEvents={loading ? 'none' : 'auto'} onClick={handleJoinGame}>
           {loading ? 'LOADING...' : 'SELECT'}
         </Button>
         <Button variant="secondary" onClick={() => globalStore.handleRuleModal()}>

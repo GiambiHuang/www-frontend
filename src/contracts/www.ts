@@ -224,6 +224,10 @@ export type Www = {
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "name",
+          "type": "string"
         }
       ]
     },
@@ -426,6 +430,10 @@ export type Www = {
           {
             "name": "lastMatch",
             "type": "u32"
+          },
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -1006,6 +1014,10 @@ export const IDL: Www = {
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "name",
+          "type": "string"
         }
       ]
     },
@@ -1208,6 +1220,10 @@ export const IDL: Www = {
           {
             "name": "lastMatch",
             "type": "u32"
+          },
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }

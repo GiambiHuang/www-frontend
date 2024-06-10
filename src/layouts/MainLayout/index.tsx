@@ -22,23 +22,21 @@ const MainLayout: React.FC = () => {
         <Box textAlign="center" padding="1rem 2rem 0.5rem" bg="rgba(0, 0, 0, 13%)" borderBottomRadius="1rem">
           {gameStore.finished ? (
               <GameCounter
-                isOver
+                finished
                 now={gameStore.currentTime}
-                startFrom={gameStore.startTime}
+                startFrom={gameStore.gameConfig.startTime}
               />
           ) : (
             gameStore.started ? (
               <GameCounter
-                isOver={!gameStore.ableToJoin}
-                now={gameStore.startTime}
+                now={gameStore.gameConfig.startTime}
                 startFrom={gameStore.currentTime}
                 starting
               />
               ) : (
               <GameCounter
-                isOver={!gameStore.ableToJoin}
                 now={gameStore.currentTime}
-                startFrom={gameStore.startTime}
+                startFrom={gameStore.gameConfig.startTime}
               />
             )
           )}

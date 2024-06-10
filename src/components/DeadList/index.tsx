@@ -2,7 +2,7 @@ import { shortAddress } from "@/utils/shortAddress";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import { FC } from "react";
 
-const DeadList: FC<{ dead: Record<string, string> }> = ({ dead }) => {
+const DeadList: FC<{ dead: { player: string, attacker: string }[] }> = ({ dead }) => {
   return (
     <Flex justifyContent="center" position="relative" maxW={'21.25rem'} w={'100%'} pt={'3rem'} pb={'1.875rem'} bg="button.border" px="1.25rem" borderRadius="1rem" border="0.375rem" borderStyle="solid" borderColor="button.bg">
       <Box
@@ -44,9 +44,9 @@ const DeadList: FC<{ dead: Record<string, string> }> = ({ dead }) => {
             },
           }}
         >
-          {Object.keys(dead).map((player, idx) => (
+          {dead.map((player, idx) => (
             <Flex
-              key={player}
+              key={player.player}
               w={'100%'}
               fontSize={'1.5rem'}
               boxShadow={'2px 2px 4px 0px rgba(0, 0, 0, 0.25) inset'}
@@ -56,7 +56,7 @@ const DeadList: FC<{ dead: Record<string, string> }> = ({ dead }) => {
             >
               <Box borderLeftRadius={'0.5rem'} flex={'0 0 2.5rem'} textAlign={'center'} color={'#fff'} bg={'button.bg'} fontFamily={'Potta One'}>{idx + 1}</Box>
               <Box borderRightRadius={'0.5rem'} bg={'#fff'} flex={1} lineHeight={1} p={'0.5rem 0.75rem'}>
-                {shortAddress(player, 4, 4)}
+                {shortAddress(player.player, 4, 4)}
               </Box>
             </Flex>
           ))}

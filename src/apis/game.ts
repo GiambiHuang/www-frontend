@@ -28,6 +28,10 @@ export type GetGameResult = {
   firstShooter: string,
 }
 
+export const getMatch = () => {
+  return anonymousProgram.account.match.fetch(gameMatchPublicKey);;
+}
+
 export const getGame = async () => {
   try {
     const match = await anonymousProgram.account.match.fetch(gameMatchPublicKey);
@@ -56,55 +60,7 @@ export const getTimestamp = async () => {
   return timestamp ? timestamp * 1000 : Date.now();
 }
 
-export const getCurrentPlayers = async () => {
-  const connection = new Connection(endpoint, 'confirmed');
-  const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
-  // const slot = await connection.getSlot();
-  // // get the latest block (allowing for v0 transactions)
-  // const block = await connection.getBlock(slot, {
-  //   maxSupportedTransactionVersion: 0,
-  // });
-  const signs = await connection.getSignaturesForAddress(anonymousProgram.programId);
-  const signatures = signs.map(s => s.signature);
-  const txns = await connection.getTransactions(
-    signatures,
-    {
-      maxSupportedTransactionVersion: 0,
-    },
-  );
-  const match = await anonymousProgram.account.match.fetch(gameMatchPublicKey);
-  const game = await getGame();
-
-  const playerPDAs = [];
-  const playerPublicKeys = [];
-  let lastGameEndSignature = '';
-  for (const txn of txns) {
-    const { blockTime, meta } = txn || {};
-    const events = eventParser.parseLogs(meta?.logMessages ?? []);
-    const { value } = events.next();
-    if (value?.name === 'JoinEvent' && (game?.startTime.toNumber() ?? 0) < (blockTime || 0)) {
-      const publicKey = new web3.PublicKey(value?.data?.player as any);
-      playerPublicKeys.push(publicKey);
-      playerPDAs.push(getPlayerPDA(anonymousProgram.programId, match.number, publicKey)[0])
-    }
-    if (value?.name === 'EndEvent') {
-      lastGameEndSignature = txn?.transaction.signatures[0] ?? '';
-      break;
-    }
-  }
-
-  const players = await anonymousProgram.account.player.fetchMultiple(playerPDAs);
-  return {
-    players: playerPublicKeys.map((publicKey, idx) => ({
-      publicKey,
-      lives: players[idx]?.lives,
-      attacked: '',
-    })),
-    lastGameEndSignature,
-  }
-}
-
-export const getAttackEvents = async (until?: string) => {
+export const fetchEvents = async ({ match, startTime = 0, until }: { match: number, startTime?: number, until?: string }) => {
   const connection = new Connection(endpoint, 'confirmed');
   const config: Record<string, string> = {};
   if (until) {
@@ -117,25 +73,58 @@ export const getAttackEvents = async (until?: string) => {
       maxSupportedTransactionVersion: 0,
     },
   );
-  const game = await getGame();
 
   const eventParser = new EventParser(anonymousProgram.programId, new BorshCoder(anonymousProgram.idl));
-  const playerUpdate: Record<string, string> = {};
+  const dead: Record<string, string>[] = [];
+  const playerPDAs = [];
+  const publickeys: web3.PublicKey[] = [];
+  let signatureUntil = until ?? '';
   for (const txn of txns) {
     const { blockTime, meta } = txn || {} ;
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
-    if (value?.name === 'AttackEvent' && (game?.startTime.toNumber() || 0) < (blockTime || 0)) {
-      const { attacker, target, targetLivesRemaining, playersRemaining } = value?.data;
-      console.log('  ------    ');
-      console.log('attacker:', attacker?.toString(), ', playersRemaining:', playersRemaining);
-      console.log('target:', target?.toString(), ', targetLivesRemaining:', targetLivesRemaining);
-      if (!targetLivesRemaining) {
-        playerUpdate[(target as web3.PublicKey).toString()] = (attacker as web3.PublicKey).toString()
-      }
+    if (startTime > (blockTime ?? 0)) {
+      signatureUntil = txn?.transaction.signatures[0] ?? '';
+      break;
+    };
+    switch (value?.name) {
+      case 'AttackEvent':
+        const { attacker, target, targetLivesRemaining } = value?.data;
+        if (!targetLivesRemaining) {
+          dead.push({
+            player: target?.toString() ?? '',
+            attacker: attacker?.toString() ?? '',
+          })
+        }
+        break;
+      case 'JoinEvent':
+        const { player } = value?.data;
+        const publicKey = new web3.PublicKey(player as any);
+        publickeys.push(publicKey);
+        playerPDAs.push(
+          getPlayerPDA(anonymousProgram.programId, match, publicKey)[0]
+        )
+        break;
+      // case 'EndEvent':
+        // if (value?.name === 'EndEvent') {
+        //   lastGameEndSignature = txn?.transaction.signatures[0] ?? '';
+        //   break;
+        // }
+        // break;
     }
   }
-  return playerUpdate;
+  const playerData = await anonymousProgram.account.player.fetchMultiple(playerPDAs);
+  const players = publickeys.map((publicKey, idx) => ({
+    publicKey: publicKey.toString(),
+    lives: playerData[idx]?.lives,
+    name: playerData[idx]?.name,
+    attacked: playerData[idx]?.attacked.attacker.toString() ?? '',
+  }));
+  return {
+    signatureUntil,
+    players,
+    dead,
+  }
 }
 
 export type LeaderboardPlayer = {

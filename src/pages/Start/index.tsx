@@ -18,21 +18,22 @@ const AppContainer = styled.div`
 `;
 
 const Start: FC = () => {
-  const { gameStore, playerStore } = store;
+  const { gameStore } = store;
   const navigate = useNavigate();
 
   const renderContent = () => {
-    if (gameStore.init && playerStore.init) {
-      return playerStore.registered ? <ReadyToPlay /> : <SelectAmount />;
+    if (gameStore.gameConfig.init && gameStore.mePlayer.init) {
+      return <SelectAmount />;
+      return gameStore.mePlayer.joined ? <ReadyToPlay /> : <SelectAmount />;
     }
     return <PendingScreen />;
   }
 
   useEffect(() => {
-    if (gameStore.init && !gameStore.ableToJoin) {
+    if (gameStore.gameConfig.init && !gameStore.ableToJoin) {
       navigate('/');
     }
-  }, [gameStore.init, gameStore.ableToJoin]);
+  }, [gameStore.gameConfig.init, gameStore.ableToJoin]);
 
   return (
     <AppContainer>

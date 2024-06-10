@@ -3,10 +3,10 @@ import { FC, useState } from "react";
 
 import SearchIcon from '@/assets/icons/search.svg?react';
 import TargetIcon from '@/assets/icons/target.svg?react';
-import { shortAddress } from "@/utils/shortAddress";
+// import { shortAddress } from "@/utils/shortAddress";
 
 interface IHitList {
-  players: string[];
+  players: { publicKey: string, name: string }[];
   onClick: (publicKey: string) => Promise<void>;
 }
 
@@ -89,10 +89,10 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
           }}
         >
           {players
-            .filter(publicKey => publicKey.toLowerCase().includes(search.toLowerCase()))
-            .map((publicKey, idx) => (
+            .filter(({ publicKey, name }) => publicKey.toLowerCase().includes(search.toLowerCase()) || name.toLowerCase().includes(search.toLowerCase()))
+            .map((player, idx) => (
               <Flex
-                key={publicKey}
+                key={player.publicKey}
                 w={'100%'}
                 fontSize={'1.5rem'}
                 boxShadow={'2px 2px 4px 0px rgba(0, 0, 0, 0.25) inset'}
@@ -100,7 +100,7 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
                 borderRadius={'0.5rem'}
                 cursor={'pointer'}
                 position={'relative'}
-                onClick={() => handleClick(publicKey)}
+                onClick={() => handleClick(player.publicKey)}
                 _hover={{
                   '.selected': {
                     visibility: 'visible'
@@ -110,9 +110,10 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
               >
                 <Box borderLeftRadius={'0.5rem'} flex={'0 0 2.5rem'} textAlign={'center'} color={'#fff'} bg={'button.bg'} fontFamily={'Potta One'}>{idx + 1}</Box>
                 <Box borderRightRadius={'0.5rem'} bg={'#fff'} flex={1} lineHeight={1} p={'0.5rem 0.75rem'}>
-                  {shortAddress(publicKey, 4, 4)}
+                  {player.name}
+                  {/* {shortAddress(publicKey, 4, 4)} */}
                 </Box>
-                <Box className="selected" visibility={selectedPlayer === publicKey ? 'visible' : 'hidden'} zIndex={1} pos={'absolute'} right={'0.5rem'}>
+                <Box className="selected" visibility={selectedPlayer === player.publicKey ? 'visible' : 'hidden'} zIndex={1} pos={'absolute'} right={'0.5rem'}>
                   <TargetIcon />
                 </Box>
               </Flex>

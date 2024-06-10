@@ -1,19 +1,24 @@
 import { Box, Text, Center, Flex } from "@chakra-ui/react";
 import Countdown, { zeroPad } from 'react-countdown'
-import { FC } from "react";
+import { FC, useMemo } from "react";
 
 interface IGameCounter {
   startFrom?: number;
+  finished?: boolean;
   now?: number;
-  isOver: boolean;
   starting?: boolean;
 }
 
-const GameCounter: FC<IGameCounter> = ({ startFrom, now, isOver, starting }) => {
+const GameCounter: FC<IGameCounter> = ({ startFrom, finished = false, now, starting }) => {
+  const text = useMemo(() => {
+    if (starting) return 'GAME STARTED';
+    if (finished) return 'GAME IS FINISHED';
+    return 'GAME STARTS IN';
+  }, [starting, finished]);
   return (
     <Box fontSize={{ base: '2.125rem', lg: '2.5rem' }}>
       <Text mb={'0.5rem'} lineHeight={1.15}>
-        {starting ? 'GAME STARTING' : startFrom && !isOver ? 'GAME STARTS IN' : 'GAME IS FINISHED'}
+        {text}
       </Text>
       <Center w={{ base: '24rem', lg: '27.5rem' }}>
         <Countdown
@@ -26,11 +31,11 @@ const GameCounter: FC<IGameCounter> = ({ startFrom, now, isOver, starting }) => 
               fontSize={{ base: '5rem', lg: '6.25rem' }}
               lineHeight={1}
             >
-              <Text flex={1}>{startFrom && !isOver ? hours : '-'}</Text>
+              <Text flex={1}>{startFrom && !finished ? hours : '-'}</Text>
               <Text>:</Text>
-              <Text flex={1}>{startFrom && !isOver ? zeroPad(minutes) : '-'}</Text>
+              <Text flex={1}>{startFrom && !finished ? zeroPad(minutes) : '-'}</Text>
               <Text>:</Text>
-              <Text flex={1}>{startFrom && !isOver ? zeroPad(seconds) : '-'}</Text>
+              <Text flex={1}>{startFrom && !finished ? zeroPad(seconds) : '-'}</Text>
             </Flex>
           }
         />

@@ -7,12 +7,12 @@ import { gameMatchPublicKey } from "@/constants/network";
 import { store } from "@/stores/RootStore";
 
 const useInitPlayerState = () => {
-  const { globalStore, playerStore, gameStore } = store;
+  const { globalStore, gameStore } = store;
   const program = useProgram();
   const isVisible = usePageVisibility();
 
   const handleFetchPlayer = useCallback(async () => {
-    if (globalStore.publicKey && !gameStore.finished && (isVisible || gameStore.round.break)) {
+    if (globalStore.publicKey) {
       try {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [playerPDA] = getPlayerPDA(
@@ -22,17 +22,19 @@ const useInitPlayerState = () => {
         );
         try {
           const player = await program.account.player.fetch(playerPDA);
-          playerStore.setPlayer(player);
+          // playerStore.setPlayer(player);
+          gameStore.setMePlayer(true, player.lives, player.attacked.attacker.toString(), player.name);
         } catch (error) {
-          playerStore.setPlayer(null);
+          gameStore.setMePlayer(false, 0, '', '');
+          // playerStore.setPlayer(null);
         }
       } catch (error) {
         console.log(error);
-        playerStore.setPlayer(null);
-        // resetPlayerState();
+        gameStore.setMePlayer(false, 0, '', '');
+        // playerStore.setPlayer(null);
       }
     }
-  }, [globalStore.publicKey, isVisible, gameStore.finished, gameStore.round.break]);
+  }, [globalStore.publicKey, isVisible, gameStore.round.break]);
 
   useEffect(() => {
     handleFetchPlayer();

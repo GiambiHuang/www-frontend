@@ -54,13 +54,13 @@ const App: FC = () => {
   }, [program]);
 
   const canJoin = useMemo(() =>
-    gameStore.ableToJoin && gameStore.init,
-    [gameStore.ableToJoin, gameStore.init]
+    gameStore.ableToJoin && gameStore.gameConfig.init,
+    [gameStore.ableToJoin, gameStore.gameConfig.init]
   );
 
   const canStart = useMemo(() => {
-    return gameStore.init && gameStore.finished && globalStore.connected;
-  }, [gameStore.init, gameStore.finished, globalStore.connected]);
+    return gameStore.finished && globalStore.connected;
+  }, [gameStore.finished, globalStore.connected]);
 
   useEffect(() => {
     ref.current = setInterval(() => {

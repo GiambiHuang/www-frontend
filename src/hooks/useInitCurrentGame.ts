@@ -38,10 +38,10 @@ const useInitCurrentGame = () => {
   }, [isVisible]);
 
   useEffect(() => {
-    if (!gameStore.init) {
+    if (!gameStore.gameConfig.init) {
       fetchCurrentGame();
     }
-  }, [gameStore.init]);
+  }, [gameStore.gameConfig.init]);
 }
 
 export default useInitCurrentGame;

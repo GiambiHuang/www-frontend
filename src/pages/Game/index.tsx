@@ -16,16 +16,18 @@ import PendingScreen from '@/modals/PendingScreen';
 import { toast } from 'react-toastify';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
+import { toJS } from 'mobx';
 
 const Game: FC = () => {
-  const { globalStore, gameStore, playerStore, playersStore } = store;
+  const { globalStore, gameStore } = store;
   const navigate = useNavigate();
   const program = useProgram();
   const [pending, setPending] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>('');
 
   const handleAttackPlayer = async (publicKey: string) => {
-    if (globalStore.publicKey && !playersStore.dead[globalStore.publicKey.toString()]) {
+    const deadPlayers = gameStore.gamePlayers.dead.map(dead => dead.player);
+    if (globalStore.publicKey && !deadPlayers.includes(globalStore.publicKey.toString())) {
       setSelected('');
       setPending(true);
       const match = await program.account.match.fetch(gameMatchPublicKey);
@@ -58,27 +60,26 @@ const Game: FC = () => {
   }
 
   const handleFinishGame = async () => {
-    if (globalStore.publicKey) {
-      if (!playersStore.isWinner) {
-        setTimeout(() => {
-          navigate('/');
-        }, 5000);
-      }
+    if (globalStore.publicKey && gameStore.isDead.dead) {
+      setTimeout(() => {
+        navigate('/');
+      }, 5000);
     }
   }
 
-  const livePlayers = useMemo(() =>
-    Object.entries(playersStore.list)
-      .filter(([_, player]) => player.lives > 0)
-      .map(([publicKey]) => publicKey)
-  , [playersStore.dead, playersStore.list]);
+  const livePlayers = useMemo(() => {
+    console.log(toJS(gameStore.gamePlayers));
+    const dead = gameStore.gamePlayers.dead.map(dead => dead.player);
+    return gameStore.gamePlayers.players
+      .filter(player => !dead.includes(player.publicKey.toString()))
+  }, [gameStore.gamePlayers.dead, gameStore.gamePlayers.players]);
 
   const selectablePlayers = useMemo(() =>
-    livePlayers.filter(publicKey => publicKey !== (globalStore.publicKey?.toString() ?? ''))
+    livePlayers.filter(player => player.publicKey !== (globalStore.publicKey?.toString() ?? ''))
   , [livePlayers, globalStore.publicKey]);
 
   const renderContent = () => {
-    const allInit = gameStore.init && playerStore.init && playersStore.init;
+    const allInit = gameStore.gameConfig.init && gameStore.mePlayer.init && gameStore.gamePlayers.init;
     if (allInit && gameStore.started) {
       const publickKey = globalStore.publicKey?.toString() ?? '';
       return (
@@ -102,9 +103,9 @@ const Game: FC = () => {
               <Arena players={livePlayers} onClick={handleAttackPlayer} me={publickKey} />
             </GridItem>
           </Grid>
-          {!playersStore.isWinner && playersStore.dead[publickKey] && <LoserModal attacker={playersStore.dead[publickKey]} onFinish={handleFinishGame} />}
-          {!playersStore.isWinner && !playersStore.dead[publickKey] && gameStore.round.break && <NextRound />}
-          {playersStore.isWinner  && <WinnerModal />}
+          {!gameStore.isWinner && !gameStore.isDead.dead && gameStore.round.break && <NextRound />}
+          {!gameStore.isWinner && gameStore.isDead.dead && <LoserModal attacker={gameStore.isDead.attacker} onFinish={handleFinishGame} />}
+          {gameStore.isWinner  && <WinnerModal />}
           {pending && <PendingScreen target={selected} />}
         </Fragment>
       );
@@ -113,11 +114,17 @@ const Game: FC = () => {
   }
 
   useEffect(() => {
-    const allInit = gameStore.init && playerStore.init && playersStore.init;
-    if (allInit && (gameStore.finished || !gameStore.started)) {
+    const allInit = gameStore.gameConfig.init && gameStore.mePlayer.init && gameStore.gamePlayers.init;
+    if (allInit) {
+      const stay = gameStore.mePlayer.joined && !gameStore.finished && gameStore.started;
+      if (!stay) {
+        navigate('/');
+      }
+    }
+    if (gameStore.gameConfig.init && gameStore.finished) {
       navigate('/');
     }
-  }, [gameStore.init, gameStore.finished, gameStore.started, playerStore.init, playersStore.init]);
+  }, [gameStore.gameConfig.init, gameStore.finished, gameStore.started, gameStore.mePlayer.init, gameStore.gamePlayers.init]);
 
   useEffect(() => {
     if (gameStore.round.num > 0) {

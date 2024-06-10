@@ -8,7 +8,7 @@ import { endpoint, network } from '@/constants/network';
 import useInitWallet from '@/hooks/useInitWallet';
 import useInitPlayerState from '@/hooks/useInitPlayerState';
 import useInitCurrentGame from '@/hooks/useInitCurrentGame';
-import useInitCurrentPlayers from '@/hooks/useInitCurrentPlayers';
+import useFetchPlayerEvents from '@/hooks/useFetchPlayerEvents';
 import 'react-toastify/dist/ReactToastify.css';
 import { observer } from 'mobx-react-lite';
 
@@ -20,7 +20,7 @@ const InitWalletLayer: FC<Props> = observer(({ children }) => {
   useInitWallet();
   useInitCurrentGame();
   useInitPlayerState();
-  useInitCurrentPlayers();
+  useFetchPlayerEvents();
   return (
     <Fragment>{children}</Fragment>
   );
