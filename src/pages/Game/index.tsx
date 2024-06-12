@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
 import { toJS } from 'mobx';
+import HandHoldingGun from '@/components/HandHoldingGun';
 
 const Game: FC = () => {
   const { globalStore, gameStore } = store;
@@ -103,6 +104,7 @@ const Game: FC = () => {
               <Arena players={livePlayers} onClick={handleAttackPlayer} me={publickKey} />
             </GridItem>
           </Grid>
+          {!gameStore.isWinner && !gameStore.isDead.dead && <HandHoldingGun stop />}
           {!gameStore.isWinner && !gameStore.isDead.dead && gameStore.round.break && <NextRound />}
           {!gameStore.isWinner && gameStore.isDead.dead && <LoserModal attacker={gameStore.isDead.attacker} onFinish={handleFinishGame} />}
           {gameStore.isWinner  && <WinnerModal />}
