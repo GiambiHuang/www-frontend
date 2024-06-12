@@ -4,7 +4,6 @@ import { FC } from "react";
 import Avatar1 from '@/assets/avatars/avatar-2.png';
 import Avatar2 from '@/assets/avatars/avatar-3.png';
 import Avatar3 from '@/assets/avatars/avatar-4.png';
-import { shortAddress } from "@/utils/shortAddress";
 import TargetIcon from '@/assets/icons/target.svg?react';
 
 interface IArena {

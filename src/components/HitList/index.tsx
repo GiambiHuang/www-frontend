@@ -3,7 +3,6 @@ import { FC, useState } from "react";
 
 import SearchIcon from '@/assets/icons/search.svg?react';
 import TargetIcon from '@/assets/icons/target.svg?react';
-import { toJS } from "mobx";
 // import { shortAddress } from "@/utils/shortAddress";
 
 interface IHitList {
