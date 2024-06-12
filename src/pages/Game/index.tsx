@@ -25,7 +25,7 @@ const Game: FC = () => {
   const [pending, setPending] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>('');
 
-  const handleAttackPlayer = async (publicKey: string) => {
+  const handleAttackPlayer = async (publicKey: string, username?: string) => {
     const deadPlayers = gameStore.gamePlayers.dead.map(dead => dead.player);
     if (globalStore.publicKey && !deadPlayers.includes(globalStore.publicKey.toString())) {
       setSelected('');
@@ -50,7 +50,7 @@ const Game: FC = () => {
           })
           .rpc();
         
-        setSelected(targetPublicKey.toString());
+        setSelected(username ?? targetPublicKey.toString());
       } catch (error) {
         console.log(error);
         toast.error((error as Error).message);

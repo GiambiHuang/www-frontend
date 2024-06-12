@@ -10,7 +10,7 @@ import TargetIcon from '@/assets/icons/target.svg?react';
 interface IArena {
   players: { publicKey: string, name: string }[];
   me: string;
-  onClick: (publicKey: string) => void;
+  onClick: (publicKey: string, username: string) => void;
 }
 
 const avatarMap = [
@@ -38,7 +38,7 @@ const Arena: FC<IArena> = ({ players, me, onClick }) => {
             }
           }}
           pointerEvents={'auto'}
-          onClick={() => onClick(player.publicKey)}
+          onClick={() => onClick(player.publicKey, player.name)}
         >
           <Box zIndex={10} pos={'absolute'} boxSize={'3rem'} className="target-icon" visibility={'hidden'}>
             <TargetIcon />

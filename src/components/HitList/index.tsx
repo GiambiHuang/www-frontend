@@ -7,17 +7,17 @@ import TargetIcon from '@/assets/icons/target.svg?react';
 
 interface IHitList {
   players: { publicKey: string, name: string }[];
-  onClick: (publicKey: string) => Promise<void>;
+  onClick: (publicKey: string, username?: string) => Promise<void>;
 }
 
 const HitList: FC<IHitList> = ({ players, onClick }) => {
   const [selectedPlayer, setSelectedPlayer] = useState('');
   const [search, setSearch] = useState('');
   
-  const handleClick = async (publicKey: string) => {
-    setSelectedPlayer(publicKey);
+  const handleClick = async (player: { publicKey: string, name: string }) => {
+    setSelectedPlayer(player.publicKey);
     try {
-      await onClick(publicKey);
+      await onClick(player.publicKey, player.name);
     } catch (error) {
       console.log(error);
     } finally {
@@ -100,7 +100,7 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
                 borderRadius={'0.5rem'}
                 cursor={'pointer'}
                 position={'relative'}
-                onClick={() => handleClick(player.publicKey)}
+                onClick={() => handleClick(player)}
                 _hover={{
                   '.selected': {
                     visibility: 'visible'

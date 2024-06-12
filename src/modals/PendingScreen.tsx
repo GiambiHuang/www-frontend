@@ -4,7 +4,7 @@ import { FC } from "react";
 
 import LoadingIcon from '@/assets/icons/loading.svg?react';
 import { isValidMotionProp, motion } from "framer-motion";
-import { shortAddress } from "@/utils/shortAddress";
+// import { shortAddress } from "@/utils/shortAddress";
 
 const ChakraBox = chakra(motion.div, {
   /**
@@ -44,7 +44,7 @@ const PendingScreen: FC<IPendingScreen> = ({ target }) => {
           {target && (
             <Box textAlign={'center'} color={'#fff'}>
               <Text fontSize={'3.125rem'}>You aimed at</Text>
-              <Text color={'#FD6'} fontSize={'4.375rem'}>{shortAddress(target, 4, 4)}</Text>
+              <Text color={'#FD6'} fontSize={'4.375rem'}>{target}</Text>
             </Box>
           )}
         </Center>
