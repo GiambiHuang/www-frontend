@@ -24,6 +24,13 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
       setSelectedPlayer('');
     }
   }
+
+  const isDubName = (publicKey: string) => {
+    const myName = players.find(player => player.publicKey)?.name;
+    const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === myName);
+    return isDub ? `${myName}@${publicKey.slice(4)}` : myName;
+  }
+
   return (
     <Flex justifyContent="center" position="relative" maxW={'21.25rem'} w={'100%'} pt={'3rem'} pb={'1.875rem'} bg="button.border" px="1.25rem" borderRadius="1rem" border="0.375rem" borderStyle="solid" borderColor="button.bg">
       <Box
@@ -110,7 +117,7 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
               >
                 <Box borderLeftRadius={'0.5rem'} flex={'0 0 2.5rem'} textAlign={'center'} color={'#fff'} bg={'button.bg'} fontFamily={'Potta One'}>{idx + 1}</Box>
                 <Box borderRightRadius={'0.5rem'} bg={'#fff'} flex={1} lineHeight={1} p={'0.5rem 0.75rem'}>
-                  {player.name}
+                  {isDubName(player.publicKey)}
                   {/* {shortAddress(publicKey, 4, 4)} */}
                 </Box>
                 <Box className="selected" visibility={selectedPlayer === player.publicKey ? 'visible' : 'hidden'} zIndex={1} pos={'absolute'} right={'0.5rem'}>
