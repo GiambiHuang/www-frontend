@@ -23,7 +23,6 @@ const Start: FC = () => {
 
   const renderContent = () => {
     if (gameStore.gameConfig.init && gameStore.mePlayer.init) {
-      return <SelectAmount />;
       return gameStore.mePlayer.joined ? <ReadyToPlay /> : <SelectAmount />;
     }
     return <PendingScreen />;
