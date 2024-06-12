@@ -1,7 +1,7 @@
 import React from 'react'
 
 import HandGun from '@/assets/images/shotgun.png';
-import { Box, Center, Img, keyframes } from '@chakra-ui/react';
+import { Box, Center, keyframes } from '@chakra-ui/react';
 import useMousePosition from '@/hooks/useMousePosition';
 import useMouseClick from '@/hooks/useMouseClick';
 

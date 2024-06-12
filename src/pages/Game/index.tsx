@@ -16,7 +16,6 @@ import PendingScreen from '@/modals/PendingScreen';
 import { toast } from 'react-toastify';
 import { observer } from 'mobx-react-lite';
 import { store } from '@/stores/RootStore';
-import { toJS } from 'mobx';
 import HandHoldingGun from '@/components/HandHoldingGun';
 
 const Game: FC = () => {
