@@ -100,10 +100,12 @@ export const fetchEvents = async ({ match, startTime = 0, until }: { match: numb
       case 'JoinEvent':
         const { player } = value?.data;
         const publicKey = new web3.PublicKey(player as any);
-        publickeys.push(publicKey);
-        playerPDAs.push(
-          getPlayerPDA(anonymousProgram.programId, match, publicKey)[0]
-        )
+        if (0 > publickeys.findIndex(key => key.toString() === publicKey.toString())) {
+          publickeys.push(publicKey);
+          playerPDAs.push(
+            getPlayerPDA(anonymousProgram.programId, match, publicKey)[0]
+          )
+        }
         break;
       // case 'EndEvent':
         // if (value?.name === 'EndEvent') {
