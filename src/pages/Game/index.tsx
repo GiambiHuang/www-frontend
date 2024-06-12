@@ -69,7 +69,6 @@ const Game: FC = () => {
   }
 
   const livePlayers = useMemo(() => {
-    console.log(toJS(gameStore.gamePlayers));
     const dead = gameStore.gamePlayers.dead.map(dead => dead.player);
     return gameStore.gamePlayers.players
       .filter(player => !dead.includes(player.publicKey.toString()))
@@ -135,7 +134,7 @@ const Game: FC = () => {
   }, [gameStore.round.num]);
 
   return (
-    <Flex flexDirection={'column'} minH={'100vh'} w={'100%'} bgImage={backgroundImg} bgPos={'center'} bgSize={'cover'} bgRepeat={'no-repeat'}>
+    <Flex userSelect={'none'} flexDirection={'column'} minH={'100vh'} w={'100%'} bgImage={backgroundImg} bgPos={'center'} bgSize={'cover'} bgRepeat={'no-repeat'}>
       {renderContent()}
     </Flex>
   )
