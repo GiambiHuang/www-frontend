@@ -3,6 +3,7 @@ import { FC, useState } from "react";
 
 import SearchIcon from '@/assets/icons/search.svg?react';
 import TargetIcon from '@/assets/icons/target.svg?react';
+import { toJS } from "mobx";
 // import { shortAddress } from "@/utils/shortAddress";
 
 interface IHitList {
@@ -25,10 +26,9 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
     }
   }
 
-  const isDubName = (publicKey: string) => {
-    const myName = players.find(player => player.publicKey)?.name;
-    const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === myName);
-    return isDub ? `${myName}@${publicKey.slice(4)}` : myName;
+  const isDubName = (publicKey: string, name: string) => {
+    const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === name);
+    return isDub >= 0 ? `${name}@${publicKey.slice(-4)}` : name;
   }
 
   return (
@@ -117,7 +117,7 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
               >
                 <Box borderLeftRadius={'0.5rem'} flex={'0 0 2.5rem'} textAlign={'center'} color={'#fff'} bg={'button.bg'} fontFamily={'Potta One'}>{idx + 1}</Box>
                 <Box borderRightRadius={'0.5rem'} bg={'#fff'} flex={1} lineHeight={1} p={'0.5rem 0.75rem'}>
-                  {isDubName(player.publicKey)}
+                  {isDubName(player.publicKey, player.name)}
                   {/* {shortAddress(publicKey, 4, 4)} */}
                 </Box>
                 <Box className="selected" visibility={selectedPlayer === player.publicKey ? 'visible' : 'hidden'} zIndex={1} pos={'absolute'} right={'0.5rem'}>

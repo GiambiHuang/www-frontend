@@ -122,6 +122,8 @@ export const fetchEvents = async ({ match, startTime = 0, until }: { match: numb
     name: playerData[idx]?.name,
     attacked: playerData[idx]?.attacked.attacker.toString() ?? '',
   }));
+  console.log('fetch all player:', players);
+  console.log('fetch all dead:', dead);
   return {
     signatureUntil,
     players,

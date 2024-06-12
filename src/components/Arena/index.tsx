@@ -21,13 +21,11 @@ const avatarMap = [
 
 const Arena: FC<IArena> = ({ players, me, onClick }) => {
 
-  const isDubName = (publicKey: string) => {
-    const myName = players.find(player => player.publicKey)?.name;
-    const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === myName);
-    return isDub ? `${myName}@${publicKey.slice(4)}` : (myName ?? shortAddress(publicKey, 4, 4));
+  const isDubName = (publicKey: string, name: string) => {
+    const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === name);
+    return isDub >= 0 ? `${name}@${publicKey.slice(-4)}` : name;
   }
 
-  console.log('---- players::', players);
   return (
     <Flex gap={'0.25rem'}>
       {players.filter(player => player.publicKey !== me).map((player, idx) => (
@@ -54,7 +52,7 @@ const Arena: FC<IArena> = ({ players, me, onClick }) => {
           <chakra.svg className="avatar-address" pos={'absolute'} top={'-0.5rem'} flex={1} width="72" fontSize={'1.125rem'} height="25" viewBox="0 0 72 25" xmlns="http://www.w3.org/2000/svg">
             <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="currentColor" strokeWidth="0.125rem" paintOrder="stroke" stroke="#2F6B75">
               {/* {shortAddress(player, 4, 4)} */}
-              {isDubName(player.publicKey)}
+              {isDubName(player.publicKey, player.name)}
             </text>
           </chakra.svg>
           <Box
