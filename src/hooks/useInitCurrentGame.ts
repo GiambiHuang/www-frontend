@@ -12,14 +12,11 @@ const useInitCurrentGame = () => {
     const game = await getGame();
     gameStore.setGame(game as GetGameResult);
     if (game) {
-      const { state } = game;
-      if (!state.finished) {
-        ref.current && clearInterval(ref.current);
-        ref.current = setInterval(() => {
-          // update current time
-          gameStore.updateTime(Date.now());
-        }, 500);
-      }
+      ref.current && clearInterval(ref.current);
+      ref.current = setInterval(() => {
+        // update current time
+        gameStore.updateTime(Date.now());
+      }, 500);
     }
   }, []);
 

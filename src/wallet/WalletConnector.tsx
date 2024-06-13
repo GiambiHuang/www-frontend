@@ -1,7 +1,7 @@
 import { FC, Fragment, useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { ToastContainer } from 'react-toastify';
-// import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { SnapWalletAdapter } from '@drift-labs/snap-wallet-adapter';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { endpoint, network } from '@/constants/network';
@@ -30,7 +30,7 @@ const WalletConnector: FC<Props> = ({ children }) => {
   const wallets = useMemo(
       () => [
         new SnapWalletAdapter(),
-        // new PhantomWalletAdapter(),
+        new PhantomWalletAdapter(),
           /**
            * Wallets that implement either of these standards will be available automatically.
            *

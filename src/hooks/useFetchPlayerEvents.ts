@@ -19,8 +19,8 @@ const useFetchPlayerEvents = () => {
     }
   }, [gameStore.gameConfig.joinTime, gameStore.gameConfig.init]);
 
-  const updatePlayerEvents = useCallback(async () => {
-    if (gameStore.round.break && gameStore.gamePlayers.init) {
+  const updatePlayerEvents = async () => {
+    if (gameStore.gamePlayers.init && gameStore.ready) {
       const match = await getMatch();
       const [playerUpdate, game] = await Promise.all([
         fetchEvents({ match: match.number, startTime: gameStore.gameConfig.joinTime / 1000, until: gameStore.gamePlayers.signature }),
@@ -29,15 +29,23 @@ const useFetchPlayerEvents = () => {
       gameStore.setFirstShooter(game?.firstShooter ?? '');
       gameStore.setGamePlayers(playerUpdate.dead, playerUpdate.players, playerUpdate.signatureUntil);
     }
-  }, [gameStore.round.break, gameStore.gamePlayers.init])
+  }
+
+  useEffect(() => {
+    if (gameStore.gamePlayers.init && gameStore.ready) {
+      updatePlayerEvents();
+    }
+  }, [gameStore.ready, gameStore.gamePlayers.init]);
+
+  useEffect(() => {
+    if (gameStore.gamePlayers.init && gameStore.round.break) {
+      updatePlayerEvents();
+    }
+  }, [gameStore.gamePlayers.init, gameStore.round.break]);
 
   useEffect(() => {
     fetchPlayerEventsOnce();
   }, [fetchPlayerEventsOnce]);
-
-  useEffect(() => {
-    updatePlayerEvents();
-  }, [updatePlayerEvents]);
 }
 
 export default useFetchPlayerEvents;

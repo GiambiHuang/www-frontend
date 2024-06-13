@@ -5,8 +5,10 @@ import { styled } from "styled-components";
 import MetaMask from "@/assets/icons/metamask.svg?react";
 import Salmon from "@/assets/icons/salmon.svg?react";
 import Close from "@/assets/icons/close.svg?react";
+import { SnapWalletAdapter } from '@drift-labs/snap-wallet-adapter';
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 
-import { Box, Flex, chakra } from "@chakra-ui/react";
+import { Box, Flex, Img, chakra } from "@chakra-ui/react";
 import { store } from "@/stores/RootStore";
 import { observer } from "mobx-react-lite";
 
@@ -39,6 +41,9 @@ const Option = chakra(Flex, {
   },
 })
 
+const phantomWallet = new PhantomWalletAdapter();
+const snapWallet = new SnapWalletAdapter();
+
 const ConnectWallet: FC = () => {
   const { globalStore } = store;
   const { wallets, select } = useWallet();
@@ -66,16 +71,16 @@ const ConnectWallet: FC = () => {
           <Close />
         </Box>
         <ConnectWalletOptions>
-          {wallets.filter(wallet => wallet.adapter.url.includes('drift-labs')).map(wallet => (
-            <Option
-              key={wallet.adapter.name}
-              onClick={() => select(wallet.adapter.name)}
-            >
-              <MetaMask />
-              <Box flex={1}>MetaMask</Box>
-              {['Installed', 'Loadable'].includes(wallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
-            </Option>
-          ))}
+          <Option onClick={() => select(phantomWallet.name)}>
+            <Img boxSize={'3rem'} src={phantomWallet.icon} />
+            <Box flex={1}>{phantomWallet.name}</Box>
+              {['Installed', 'Loadable'].includes(phantomWallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
+          </Option>
+          <Option onClick={() => select(snapWallet.name)}>
+            <MetaMask />
+            <Box flex={1}>MetaMask</Box>
+              {['Installed', 'Loadable'].includes(snapWallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
+          </Option>
           {wallets.filter(wallet => wallet.adapter.name.includes('Salmon')).map(wallet => (
             <Option
               key={wallet.adapter.name}

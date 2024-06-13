@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from "react";
 
 import backgroundImg from '@/assets/images/background-result.webp'
 import { isValidMotionProp, motion } from "framer-motion";
-import { shortAddress } from "@/utils/shortAddress";
+// import { shortAddress } from "@/utils/shortAddress";
 
 const ChakraBox = chakra(motion.div, {
   /**
@@ -97,7 +97,7 @@ const LoserModal: FC<{ attacker: string, onFinish: () => void }> = ({ attacker, 
                   KILLED BY
                 </GridItem>
                 <GridItem textAlign={'center'} fontSize={'2rem'} color={'#fff'}>
-                  {shortAddress(attacker, 4, 4)}
+                  {attacker}
                 </GridItem>
                 <GridItem textAlign={'right'} fontSize={'1.75rem'} color={'#444444'}>
                   POINTS EARNED

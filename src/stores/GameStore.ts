@@ -1,4 +1,4 @@
-import { computed, makeAutoObservable, runInAction } from "mobx";
+import { computed, makeAutoObservable, runInAction, toJS } from "mobx";
 import { RootStore } from "./RootStore";
 import { BN } from "@coral-xyz/anchor";
 import { GetGameResult, getGame } from "@/apis/game";
@@ -53,7 +53,7 @@ export class GameStore {
   }
 
   get finished () {
-    return !Boolean(this.state.live);
+    return !Boolean(this.state.live) && !Boolean(this.state.draw);
   }
 
   get started () {
@@ -113,9 +113,10 @@ export class GameStore {
 
   get isDead () {
     const deadInfo = this.gamePlayers.dead.find(dead => dead.player === (this.rootStore.globalStore.publicKey?.toString() ?? ''))
+    const attackerName = deadInfo?.attacker ? this.gamePlayers.players.find(player => player.publicKey === deadInfo.attacker).name : '';
     return {
       dead: this.gamePlayers.init ? Boolean(deadInfo) : false,
-      attacker: deadInfo?.attacker ?? '',
+      attacker: deadInfo?.attacker ? (attackerName || deadInfo.attacker) : '',
     }
   }
 
@@ -163,8 +164,21 @@ export class GameStore {
 
   async refresh () {
     const game = await getGame();
-    if (this.state && JSON.stringify(game?.state) !== JSON.stringify(this.state)) {
+    if (this.state && JSON.stringify(game?.state) !== JSON.stringify(toJS(this.state))) {
       this.gameConfig.init = false;
+      this.mePlayer = {
+        init: false,
+        joined: false,
+        name: '',
+        lives: 0,
+        attacked: '',
+      }
+      this.gamePlayers = {
+        init: false,
+        signature: '',
+        dead: [] as any[],
+        players: [] as any[],
+      }
     }
   }
 

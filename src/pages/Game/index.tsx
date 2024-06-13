@@ -32,7 +32,7 @@ const Game: FC = () => {
       setPending(true);
       const match = await program.account.match.fetch(gameMatchPublicKey);
       const [gameAccount] = getGamePDA(program.programId, match.number, gameMatchPublicKey);
-      
+
       const targetPublicKey = new web3.PublicKey(publicKey);
       const [attackAccount] = getAttackPDA(program.programId, match.number, globalStore.publicKey);
       const [playerAccount] = getPlayerPDA(program.programId, match.number, globalStore.publicKey);

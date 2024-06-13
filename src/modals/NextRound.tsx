@@ -16,7 +16,7 @@ const NextRound: FC = () => {
         gap={'6.25rem'}
         bgColor={'rgba(68, 68, 68, 0.9)'}
       >
-        <DeadList dead={gameStore.gamePlayers.dead} />
+        <DeadList dead={gameStore.gamePlayers.dead} players={gameStore.gamePlayers.players} />
         <Center fontFamily="Potta One" flexDirection={'column'}>
           <Text color="button.border" fontSize={'2.5rem'} lineHeight={1.45}>NEXT ROUND STARTS IN</Text>
           <chakra.svg flex={1} textShadow={'0 0.25rem 0.25rem rgba(0, 0, 0, 0.25)'} width="200px" fontSize={'10rem'} height="200px" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">

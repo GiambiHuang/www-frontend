@@ -34,7 +34,6 @@ const App: FC = () => {
   }, [globalStore.connected]);
 
   const handleStart = useCallback(async () => {
-    ref.current && clearInterval(ref.current);
     const match = await program.account.match.fetch(gameMatchPublicKey);
     const [gameAccount] = getGamePDA(program.programId, match.number + 1, gameMatchPublicKey);
     try {
@@ -49,7 +48,6 @@ const App: FC = () => {
     } catch (error) {
       console.log("error:", error);
     } finally {
-      gameStore.refresh();
     }
   }, [program]);
 

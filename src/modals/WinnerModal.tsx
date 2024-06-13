@@ -46,7 +46,7 @@ const WinnerModal: FC = () => {
           playerStatsAccount
         })
         .rpc();
-        store.reset();
+        store.gameStore.refresh();
         navigate('/');
     } catch (error) {
       toast.error((error as Error).message);

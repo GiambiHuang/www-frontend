@@ -27,7 +27,7 @@ const HitList: FC<IHitList> = ({ players, onClick }) => {
 
   const isDubName = (publicKey: string, name: string) => {
     const isDub = players.findIndex(player => player.publicKey !== publicKey && player.name === name);
-    return isDub >= 0 ? `${name}@${publicKey.slice(-4)}` : name;
+    return isDub >= 0 ? `${name}(...${publicKey.slice(-4)})` : name;
   }
 
   return (

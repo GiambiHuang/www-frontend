@@ -12,7 +12,7 @@ const useInitPlayerState = () => {
   const isVisible = usePageVisibility();
 
   const handleFetchPlayer = useCallback(async () => {
-    if (globalStore.publicKey) {
+    if (globalStore.publicKey && !gameStore.finished) {
       try {
         const match = await program.account.match.fetch(gameMatchPublicKey);
         const [playerPDA] = getPlayerPDA(
@@ -34,7 +34,7 @@ const useInitPlayerState = () => {
         // playerStore.setPlayer(null);
       }
     }
-  }, [globalStore.publicKey, isVisible, gameStore.round.break]);
+  }, [globalStore.publicKey, isVisible, gameStore.round.break, gameStore.finished]);
 
   useEffect(() => {
     handleFetchPlayer();

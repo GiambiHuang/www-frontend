@@ -79,10 +79,14 @@ export const fetchEvents = async ({ match, startTime = 0, until }: { match: numb
   const playerPDAs = [];
   const publickeys: web3.PublicKey[] = [];
   let signatureUntil = until ?? '';
+  console.log(until, match, startTime);
+  console.log('txns:', txns);
+  const deadPublicKey: string[] = [];
   for (const txn of txns) {
     const { blockTime, meta } = txn || {} ;
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
+    console.log(value?.name, startTime, blockTime);
     if (startTime > (blockTime ?? 0)) {
       signatureUntil = txn?.transaction.signatures[0] ?? '';
       break;
@@ -90,7 +94,8 @@ export const fetchEvents = async ({ match, startTime = 0, until }: { match: numb
     switch (value?.name) {
       case 'AttackEvent':
         const { attacker, target, targetLivesRemaining } = value?.data;
-        if (!targetLivesRemaining) {
+        if (!targetLivesRemaining && !deadPublicKey.includes(target?.toString() ?? '')) {
+          deadPublicKey.push(target?.toString() ?? '');
           dead.push({
             player: target?.toString() ?? '',
             attacker: attacker?.toString() ?? '',
