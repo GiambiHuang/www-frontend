@@ -64,7 +64,6 @@ const SelectAmount: FC = () => {
           globalStore.publicKey,
         );
         const player = await program.account.player.fetch(playerPDA);
-        console.log('player:', player);
         gameStore.setMePlayer(true, player.lives, player.attacked.attacker.toString(), player.name);
         // playerStore.setPlayer(player);
       } catch (error) {

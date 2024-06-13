@@ -23,6 +23,7 @@ export type GetGameResult = {
   state: {
     finished?: {};
     live?: {};
+    draw?: {};
   },
   survivors: number,
   firstShooter: string,
@@ -79,14 +80,11 @@ export const fetchEvents = async ({ match, startTime = 0, until }: { match: numb
   const playerPDAs = [];
   const publickeys: web3.PublicKey[] = [];
   let signatureUntil = until ?? '';
-  console.log(until, match, startTime);
-  console.log('txns:', txns);
   const deadPublicKey: string[] = [];
   for (const txn of txns) {
     const { blockTime, meta } = txn || {} ;
     const events = eventParser.parseLogs(meta?.logMessages ?? []);
     const { value } = events.next();
-    console.log(value?.name, startTime, blockTime);
     if (startTime > (blockTime ?? 0)) {
       signatureUntil = txn?.transaction.signatures[0] ?? '';
       break;

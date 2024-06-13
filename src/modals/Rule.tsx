@@ -39,7 +39,6 @@ const rules = [
 ];
 
 const Rule: FC = () => {
-  console.log(store.globalStore.ruleModal);
   return (
     <AppModal open={store.globalStore.ruleModal}>
       <Flex
