@@ -127,7 +127,7 @@ const SelectAmount: FC = () => {
         {!isEnableName && <Center color={'#fff'} mt={'0.5rem'} bgColor={'#CD2927'} fontSize={'1.25rem'}>Your name is too long</Center>}
       </Box>
       <Flex flexDirection="column" maxW="22.5rem" w={'100%'} gap="1.125rem" py={'1rem'} >
-        <Button variant="primary" width="100%" isDisabled={!amount || !isEnableName} pointerEvents={loading ? 'none' : 'auto'} onClick={handleJoinGame}>
+        <Button variant="primary" width="100%" isDisabled={!amount || !isEnableName || !name} pointerEvents={loading ? 'none' : 'auto'} onClick={handleJoinGame}>
           {loading ? 'LOADING...' : 'SELECT'}
         </Button>
         <Button variant="secondary" onClick={() => globalStore.handleRuleModal()}>
