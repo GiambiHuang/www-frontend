@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
-import { Flex, Box, Button, Center, Text, Img } from "@chakra-ui/react";
+import { Flex, Box, Button, Center } from "@chakra-ui/react";
 
 import Logo from '@/assets/images/logo-main.svg?react';
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,6 @@ import { gameMatchPublicKey } from '@/constants/network';
 import { getGamePDA } from '@/utils/www';
 import { BN } from '@coral-xyz/anchor';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import JackpotImage from '@/assets/images/jackpot.png';
 import Jackpot from '@/components/Jackpot';
 
 const AppContainer = styled.div`
