@@ -27,6 +27,8 @@ export type GetGameResult = {
   },
   survivors: number,
   firstShooter: string,
+  pool: number,
+  fee: number,
 }
 
 export const getMatch = () => {
@@ -41,13 +43,18 @@ export const getGame = async () => {
       match.number,
       gameMatchPublicKey,
     );
-    const game = await anonymousProgram.account.game.fetch(gamePDA);
+    const [gamePool, game] = await Promise.all([
+      anonymousProgram.provider.connection.getBalance(gamePDA),
+      anonymousProgram.account.game.fetch(gamePDA),
+    ])
     return {
       config: match.gameCfg,
       startTime: game.startTime,
       state: game.state,
       survivors: game.survivors,
       firstShooter: game.round.firstShooter.toString(),
+      pool: gamePool,
+      fee: game.rentExempt.toNumber() + match.gameCfg.fee.toNumber(),
     }
   } catch (error) {
     console.log(error);

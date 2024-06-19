@@ -18,6 +18,9 @@ export class GameStore {
     roundSettlement: 0,
   }
 
+  gamePool: number = 0;
+  gameFee: number = 0;
+
   timeDiff = {
     browserTime: 0,
     sysTime: 0,
@@ -151,6 +154,9 @@ export class GameStore {
         roundSettlement: game ? game.config.roundSettlementDuration.toNumber() : 0,
         entranceFee: game ? game.config.entranceFee : new BN(0),
       }
+      this.gamePool = game?.pool ?? 0;
+      this.gameFee = game?.fee ?? 0;
+
       this.state = game?.state ?? {};
       this.firstShooter = game?.firstShooter ?? '';
     });
@@ -164,20 +170,27 @@ export class GameStore {
 
   async refresh () {
     const game = await getGame();
-    if (this.state && JSON.stringify(game?.state) !== JSON.stringify(toJS(this.state))) {
-      this.gameConfig.init = false;
-      this.mePlayer = {
-        init: false,
-        joined: false,
-        name: '',
-        lives: 0,
-        attacked: '',
-      }
-      this.gamePlayers = {
-        init: false,
-        signature: '',
-        dead: [] as any[],
-        players: [] as any[],
+    if (this.state) {
+      if (JSON.stringify(game?.state) !== JSON.stringify(toJS(this.state))) {
+        this.gameConfig.init = false;
+        this.gamePool = 0;
+        this.gameFee = 0;
+        this.mePlayer = {
+          init: false,
+          joined: false,
+          name: '',
+          lives: 0,
+          attacked: '',
+        }
+        this.gamePlayers = {
+          init: false,
+          signature: '',
+          dead: [] as any[],
+          players: [] as any[],
+        }
+      } else {
+        this.gamePool = game?.pool ?? this.gamePool;
+        this.gameFee = game?.fee ?? this.gameFee;
       }
     }
   }

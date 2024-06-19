@@ -6,9 +6,9 @@ import MetaMask from "@/assets/icons/metamask.svg?react";
 import Salmon from "@/assets/icons/salmon.svg?react";
 import Close from "@/assets/icons/close.svg?react";
 import { SnapWalletAdapter } from '@drift-labs/snap-wallet-adapter';
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+// import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 
-import { Box, Flex, Img, chakra } from "@chakra-ui/react";
+import { Box, Button, Flex, chakra } from "@chakra-ui/react";
 import { store } from "@/stores/RootStore";
 import { observer } from "mobx-react-lite";
 
@@ -18,6 +18,7 @@ const ConnectWalletOptions = styled.div`
   gap: 0.75rem;
   width: 30.3125rem;
   padding-top: 4.25rem;
+  padding-bottom: 1.25rem;
 `;
 
 const Option = chakra(Flex, {
@@ -41,12 +42,12 @@ const Option = chakra(Flex, {
   },
 })
 
-const phantomWallet = new PhantomWalletAdapter();
+// const phantomWallet = new PhantomWalletAdapter();
 const snapWallet = new SnapWalletAdapter();
 
 const ConnectWallet: FC = () => {
   const { globalStore } = store;
-  const { wallets, select } = useWallet();
+  const { wallets, select, disconnect, connected } = useWallet();
   return (
     <AppModal open={globalStore.connectModal}>
       <Flex justifyContent="center" position="relative" minH="24rem" fontFamily="Potta One" bg="button.border" px="2.125rem" borderRadius="1rem" border="0.5rem" borderStyle="solid" borderColor="button.bg">
@@ -71,11 +72,6 @@ const ConnectWallet: FC = () => {
           <Close />
         </Box>
         <ConnectWalletOptions>
-          <Option onClick={() => select(phantomWallet.name)}>
-            <Img boxSize={'3rem'} src={phantomWallet.icon} />
-            <Box flex={1}>{phantomWallet.name}</Box>
-              {['Installed', 'Loadable'].includes(phantomWallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
-          </Option>
           <Option onClick={() => select(snapWallet.name)}>
             <MetaMask />
             <Box flex={1}>MetaMask</Box>
@@ -91,6 +87,7 @@ const ConnectWallet: FC = () => {
               {['Installed', 'Loadable'].includes(wallet.readyState) && <Box fontSize="1.125rem" lineHeight={1} color="text.detected">DETECTED</Box>}
             </Option>
           ))}
+          {connected && (<Button onClick={disconnect} mt={'auto'}>Disconnect</Button>)}
         </ConnectWalletOptions>
       </Flex>
     </AppModal>

@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
-import { Flex, Box, Button, Center } from "@chakra-ui/react";
+import { Flex, Box, Button, Center, Text, Img } from "@chakra-ui/react";
 
 import Logo from '@/assets/images/logo-main.svg?react';
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,9 @@ import useProgram from '@/hooks/useProgram';
 import { gameMatchPublicKey } from '@/constants/network';
 import { getGamePDA } from '@/utils/www';
 import { BN } from '@coral-xyz/anchor';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import JackpotImage from '@/assets/images/jackpot.png';
+import Jackpot from '@/components/Jackpot';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -77,9 +80,8 @@ const App: FC = () => {
             <Logo />
           </Box>
           <Flex flexDirection="column" maxW="22.5rem" w={'100%'} gap="1.125rem" mt={'-1rem'}>
-            <Button variant="primary" width="100%" isDisabled={!canStart} onClick={handleStart}>
-              START GAME
-            </Button>
+            {canStart && (<Button variant="primary" width="100%" isDisabled={!canStart} onClick={handleStart}>START GAME</Button>)}
+            {gameStore.ableToJoin && gameStore.gameConfig.init && <Jackpot amount={Number(((gameStore.gamePool - gameStore.gameFee) / LAMPORTS_PER_SOL).toFixed(4))} />}
             <Button variant="primary" width="100%" isDisabled={!canJoin} onClick={handlePlay}>
               JOIN GAME
             </Button>
